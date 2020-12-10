@@ -1,6 +1,6 @@
 package game;
 
-public class Chessman {
+public abstract class Chessman {
 	
 	private String n;
 	private String c; 
@@ -31,6 +31,13 @@ public class Chessman {
 	String getColor() {
 		return this.c;
 	}
+	
+	/**
+	 * Méthode permettant d'implementer un movement selon le type de la pièce.
+	 * @param move
+	 * @return
+	 */
+	public abstract boolean isOk(Move move);
 
 
 }
