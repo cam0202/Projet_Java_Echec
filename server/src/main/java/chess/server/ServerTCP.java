@@ -1,8 +1,11 @@
 package chess.server;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -47,10 +50,10 @@ class ServerTCP extends Thread {
             this.client = client;
         }
 
-        private void fillBuffer(Reader reader, char[] buffer) throws IOException {
+        private void fillBuffer(InputStream stream, byte[] buffer) throws IOException {
             int cursor = 0;
             while (cursor < buffer.length) {
-                int r = reader.read(buffer, cursor, buffer.length - cursor);
+                int r = stream.read(buffer, cursor, buffer.length - cursor);
                 if (r == -1) {
                     // ERROR
                 } else {
@@ -62,17 +65,21 @@ class ServerTCP extends Thread {
         @Override
         public void run() {
             try {
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()))) {
+                try (BufferedInputStream in = new BufferedInputStream(client.getInputStream());
+                        BufferedOutputStream out = new BufferedOutputStream(client.getOutputStream())) {
 
                     // Read header size
-                    char[] header = new char[chess.protocol.Header.SIZE];
-                    char[] payload;
+                    byte[] header = new byte[chess.protocol.Header.SIZE_ENCODED];
+                    byte[] payload;
                     while (!isInterrupted()) {
                         fillBuffer(in, header);
-                        // TODO: process header and get payload size
-                        payload = new char[0];
+                        chess.protocol.Header decodedHeader = chess.protocol.Header.decode(header);
+
+                        payload = new byte[decodedHeader.getPayloadLength()];
                         fillBuffer(in, payload);
+                        chess.protocol.Payload decodedPayload = chess.protocol.Payload.decode(payload);
+
+                        chess.protocol.Message message = new chess.protocol.Message(decodedHeader, decodedPayload);
                     }
                 }
 
