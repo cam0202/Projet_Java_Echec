@@ -1,4 +1,4 @@
-package chess;
+package app;
 
 import static org.junit.Assert.assertTrue;
 
