@@ -8,7 +8,7 @@ public class Location {
 	 * Constructeur
 	 * Position de la pièce
 	 */
-	Location(int row, int column){
+	Location(int column, int row){
 		this.r = row;
 		this.c = column;
 	}
