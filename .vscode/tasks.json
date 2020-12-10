@@ -6,7 +6,7 @@
         {
             "label": "build_project",
             "type": "shell",
-            "command": "mvn -B compile",
+            "command": "mvn -B package",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

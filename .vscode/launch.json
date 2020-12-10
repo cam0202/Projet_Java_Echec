@@ -9,23 +9,23 @@
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "preLaunchTask": "build_project",
+            "preLaunchTask": "build_project"
         },
         {
             "type": "java",
             "name": "Debug (Launch)-App<client>",
             "request": "launch",
-            "mainClass": "chess.App",
+            "mainClass": "chess.app.App",
             "projectName": "client",
-            "preLaunchTask": "build_project",
+            "preLaunchTask": "build_project"
         },
         {
             "type": "java",
             "name": "Debug (Launch)-App<server>",
             "request": "launch",
-            "mainClass": "chess.App",
+            "mainClass": "chess.app.App",
             "projectName": "server",
-            "preLaunchTask": "build_project",
+            "preLaunchTask": "build_project"
         }
     ]
 }

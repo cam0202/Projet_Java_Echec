@@ -51,7 +51,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>app.App</mainClass>
+              <mainClass>chess.app.App</mainClass>
             </manifest>
           </archive>
         </configuration>
