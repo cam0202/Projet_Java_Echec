@@ -10,7 +10,7 @@ public abstract class Chessman {
 	 * @param color
 	 */
 	Chessman(String name, Color color){
-		this.c = n;
+		this.n = name;
 		this.c = color.getColor();
 	}
 	
