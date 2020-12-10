@@ -24,11 +24,11 @@ public class Chessman {
 	/**
 	 * Fonctions recupération infos
 	 */
-	String name() {
-		return this.name();
+	String getName() {
+		return this.n;
 	}
 	
-	String color() {
+	String getColor() {
 		return this.c;
 	}
 
