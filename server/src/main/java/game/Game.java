@@ -121,8 +121,8 @@ public class Game {
 							&& Math.abs(move.getLocationX()) + Math.abs(move.getLocationY()) <= 1)){
 						
 						// jumpX et jumpY repésente le saut 
-						int jumpX = move.getLocationX() == 0 ? 0 : 1;
-						int jumpY = move.getLocationY() == 0 ? 0 : 1;
+						int jumpX = move.getLocationX() == 0 ? 0 : (int)(move.getLocationX()/Math.abs(move.getLocationX()));
+						int jumpY = move.getLocationY() == 0 ? 0 : (int)(move.getLocationY()/Math.abs(move.getLocationY()));
 						
 						// vérification qu'il n'est pas de pion dans le déplacement prévu 
 						for (int ctrX = (int)move.getStart().getColumn() + jumpX, ctrY = (int)move.getStart().getRow() + jumpY;
