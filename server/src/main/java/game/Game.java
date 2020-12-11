@@ -86,28 +86,34 @@ public class Game {
 	boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger 
 		Chessman startChessman = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
-		String chessmanColor = startChessman.getColor();
 		// première condition la case doit être libre et que le movement ne soit pas null
-		if(this.getSquare(move.getEnd().getRow(),move.getEnd().getColumn()).isTaken() == false && move.isNul() == false) {
-			// on commence le traitement 
-			if(!(startChessman.getName().equals("Knight"))) {
-				
-				if(!(startChessman.getName().equals("Pawn"))) {
-				
-					int jumpX = move.getLocationX()== 0 ? 0 : (int)(move.getEnd().getColumn() - move.getStart().getRow())/Math.abs((int)(move.getEnd().getColumn() - move.getStart().getRow()));
+		if(this.chess[move.getEnd().getColumn()][move.getEnd().getRow()].isTaken() == false && move.isNul() == false) {
 			
-					int jumpY = move.getLocationY() == 0 ? 0 : (int)(move.getEnd().getRow() - move.getStart().getRow())/Math.abs((int)(move.getEnd().getRow() - move.getStart().getRow()));
-					// A part un cavalier aucune pièce ne peut en sauter une autre
-					System.out.println(jumpX + " " + jumpY);
+			// on commence le traitement 
+			if(!(startChessman instanceof Knight)) {
+				
+				if(!(startChessman instanceof Pawn)) {
 					
-					for (int ctrX = move.getStart().getColumn() + jumpX; ctrX != move.getEnd().getColumn() ;ctrX += jumpX) {
-						for(int ctrY = (int)move.getStart().getColumn()+ jumpY; ctrY != move.getEnd().getRow() ;ctrY += jumpY) {
-							if (this.chess[ctrX][ctrY].isTaken()){
-								return false;
+					
+					if(!(Math.abs(move.getLocationX()) - Math.abs(move.getLocationY()) <= 1
+							&& Math.abs(move.getLocationX()) + Math.abs(move.getLocationY()) <= 1)){
+						
+						int jumpX = move.getLocationX() == 0 ? 0 : 1;
+						int jumpY = move.getLocationY() == 0 ? 0 : 1;
+						
+						System.out.println(jumpX+" "+jumpY);
+						for (int ctrX = (int)move.getStart().getColumn() + jumpX, ctrY = (int)move.getStart().getRow() + jumpY;
+								ctrX != (int)move.getEnd().getColumn() | ctrY != (int)move.getEnd().getRow();
+								ctrX += jumpX, ctrY += jumpY){
+								if (this.chess[ctrX][ctrY].isTaken()){
+									return false;
+								}
 							}
-						}
+						return true;
+					}else {
+						return true;
 					}
-					return true;
+						
 				} else {
 					return !this.getSquare(move.getEnd().getRow(),move.getEnd().getColumn()).isTaken();
 				}

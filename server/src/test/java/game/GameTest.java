@@ -66,6 +66,8 @@ public class GameTest {
 	@Test 
 	public void testMoveOk() {
 		this.g.startGame();
+		
+		
 		// Pawn
 		Move m1 = new Move(new Location(3,1), new Location(3,3));
 		assertEquals(this.g.moveOk(m1), true);
@@ -75,11 +77,12 @@ public class GameTest {
 		m1 = new Move(new Location(7,0), new Location(7,4));
 		assertEquals(this.g.moveOk(m1), false);
 		this.g.cleanSquare(7, 1);
-		assertEquals(this.g.getSquare(7, 1).isTaken(),false);
 		assertEquals(this.g.moveOk(m1), true);
+		
 		
 		// Knight
 		m1 = new Move(new Location(6,0), new Location(6,5));
+		System.out.print(this.g.getSquare(6, 0).getChessman().getName());
 		assertEquals(this.g.moveOk(m1), true);
 		
 		// Bishop
@@ -99,6 +102,7 @@ public class GameTest {
 		assertEquals(this.g.moveOk(m1), false);
 		this.g.cleanSquare(4, 1);
 		assertEquals(this.g.moveOk(m1), true);
+		
 	}
 	
 	@Test
