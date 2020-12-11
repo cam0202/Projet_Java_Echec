@@ -43,6 +43,8 @@ public class MoveTest {
 		assertEquals (this.m.isNul(), true);
 		Move m2 = new Move(this.start, new Location(1,3));
 		assertEquals (m2.isNul(), false);
+		m2 = new Move(this.start, new Location(3,1));
+		assertEquals (m2.isNul(), false);
 	}
 
 }
