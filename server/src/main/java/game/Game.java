@@ -1,12 +1,24 @@
 package game;
-
+/**
+ * Class Game 
+ * Elle permet de réprésenter le jeux.
+ *
+ */
 public class Game {
 	
-	// Tableau des cases
+	/**
+	 * Tableau d'objet Square, permet de réprésenter les case d'un échiquier.  
+	 */
 	private Square[][] chess; 
+	/**
+	 *  Tableau de couleur, permet de réprésenter la couleur des joueur.
+	 */
 	private Color[] colorPlayers;	
 	/**
-	 * Constructeur 
+	 * Game Constructor
+	 * Crée un tableau de 8x8 case et crée un tableau de 2 couleurs
+	 * @param colorP1, couleur du joueur 1
+	 * @param colorP2, couleur du joueur 2
 	 */
 	Game(Color colorP1, Color colorP2){
 		// init des 64 case de l'échequier
@@ -24,25 +36,35 @@ public class Game {
 	}
 	
 	/**
-	 * 
-	 * @param row
-	 * @param column
-	 * @return
+	 * getSquare, permet de récupérer une case choisi dans le jeu
+	 * @param column, x
+	 * @param row, y
+	 * @return la case de la position choisi
 	 */
-	Square getSquare(int row, int column) {
-		return this.chess[row][column];
+	Square getSquare(int column, int row) {
+		return this.chess[column][row];
 	}
 	
-	void cleanSquare(int row, int column) {
-		this.chess[row][column].setChessman(null);
+	/**
+	 * clenSquare, vide la case chosi
+	 * @param column, x
+	 * @param row, y
+	 */
+	void cleanSquare(int column, int row) {
+		this.chess[column][row].setChessman(null);
 	}
 	
-	void setSquare(int row, int column, Chessman c) {
+	/**
+	 * setSquare, MAJ la case chosi
+	 * @param column, x
+	 * @param row, y
+	 */
+	void setSquare(int column, int row, Chessman c) {
 		this.chess[row][column].setChessman(c);
 	}
 	
 	/**
-	 * Placement de toutes les pièces sur l'échéquier
+	 * startGame, initialise le plateau de jeu
 	 */
 	void startGame(){
 		// player 1
@@ -79,9 +101,9 @@ public class Game {
 	}
 	
 	/**
-	 * vérification d'un déplacement 
+	 * moveOk, permet de vérifier si un pion peu bouger 
 	 * @param move
-	 * @return
+	 * @return true, false
 	 */
 	boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger 
@@ -94,14 +116,15 @@ public class Game {
 				
 				if(!(startChessman instanceof Pawn)) {
 					
-					
+					// vérification que le déplacement est supérieur à un 
 					if(!(Math.abs(move.getLocationX()) - Math.abs(move.getLocationY()) <= 1
 							&& Math.abs(move.getLocationX()) + Math.abs(move.getLocationY()) <= 1)){
 						
+						// jumpX et jumpY repésente le saut 
 						int jumpX = move.getLocationX() == 0 ? 0 : 1;
 						int jumpY = move.getLocationY() == 0 ? 0 : 1;
 						
-						System.out.println(jumpX+" "+jumpY);
+						// vérification qu'il n'est pas de pion dans le déplacement prévu 
 						for (int ctrX = (int)move.getStart().getColumn() + jumpX, ctrY = (int)move.getStart().getRow() + jumpY;
 								ctrX != (int)move.getEnd().getColumn() | ctrY != (int)move.getEnd().getRow();
 								ctrX += jumpX, ctrY += jumpY){
@@ -115,6 +138,7 @@ public class Game {
 					}
 						
 				} else {
+					// cas pion 
 					return !this.getSquare(move.getEnd().getRow(),move.getEnd().getColumn()).isTaken();
 				}
 				
@@ -127,7 +151,10 @@ public class Game {
 		return false;
 	}
 	
-	
+	/**
+	 * Bouge le pion
+	 * @param move
+	 */
 	void move(Move move) {
 		if(this.moveOk(move)) {
 			Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();

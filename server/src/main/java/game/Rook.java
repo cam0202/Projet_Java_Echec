@@ -1,19 +1,27 @@
 package game;
-
+/**
+ * 
+ * Rook Class
+ * Represente le chessman tours
+ *
+ */
 public class Rook extends Chessman{
 	
 	
 	/**
 	 * Constructeur
-	 * @param chessman
+	 * @param Color
 	 */
 	Rook(Color c){
 		super("Rook", c);
 	}
 
-	@Override
+	/**
+	 * isOk, vérification du déplacement pour une tour
+	 * @param Move
+	 */
 	public boolean isOk(Move move) {
-		// déplacement vertival
+		// La tour ne peut que ce déplacer de façon verticale 
 		return move.getLocationX() * move.getLocationY() == 0 && !move.isNul();
 	}
 

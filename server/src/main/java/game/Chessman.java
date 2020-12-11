@@ -1,10 +1,20 @@
 package game;
-
+/**
+ * Chessman Abstract Class
+ * Point de départ de toute pièce du jeu
+ */
 public abstract class Chessman {
-	
-	private String n;
-	private String c; 
 	/**
+	 * nom de la pièce
+	 */
+	private String n;
+	/**
+	 * couleur de la pièce
+	 */
+	private String c; 
+	
+	/**
+	 * Chessman Constructor
 	 * Constructeur de la pièce
 	 * @param name
 	 * @param color
@@ -15,25 +25,30 @@ public abstract class Chessman {
 	}
 	
 	/**
-	 * Fonction évolution pièce
+	 * setName, met un nom à la pièce
 	 */
 	void setName(String newName) {
 		this.n = newName;
 	}
 	
 	/**
-	 * Fonctions recupération infos
+	 * getName, recupération du nom
+	 * @return String
 	 */
 	String getName() {
 		return this.n;
 	}
 	
+	/**
+	 * getColor, récupération de la couleur 
+	 * @return String
+	 */
 	String getColor() {
 		return this.c;
 	}
 	
 	/**
-	 * Méthode permettant d'implementer un movement selon le type de la pièce.
+	 * isOk, abstract méthode permettant d'implementer un movement selon le type de la pièce.
 	 * @param move
 	 * @return
 	 */

@@ -1,29 +1,36 @@
 package game;
-
+/**
+ * 
+ * Move Class
+ * Sert à représenter un déplacement sur le plateau de jeu
+ *
+ */
 public class Move {
 	/**
-	 * Deplacement sur l'axe des X
+	 * double Deplacement sur l'axe des X
 	 */
 	private double moveX;
 	
 	/**
-	 * Deplacement sur l'axe des Y
+	 * double Deplacement sur l'axe des Y
 	 */
 	private double moveY;
 	
 	/**
-	 * Coordonnee de la case d'arrivee
+	 * Location Coordonnee de la case d'arrivee
 	 */
 	private Location e;
 	
 	/**
-	 * Coordonnee de la case de depart
+	 * Location Coordonnee de la case de depart
 	 */
 	private Location s;
 	
 
-	/**Constructeur d'un objet déplacement, 
-	 * @param Prend en paramètre les coordonnees de depart et d'arrive du deplacement => position 
+	/**
+	 * Move Constructor 
+	 * @param start
+	 * @param end
 	 */
 	Move(Location start, Location end){
 		this.e = end;
@@ -32,23 +39,42 @@ public class Move {
 		this.moveY = end.getRow() - start.getRow();
 	}
 
-
+	/**
+	 * getLocationX, donne la coordonné en x
+	 * @return double
+	 */
 	double getLocationX() {
 		return moveX;
 	}
-
+	
+	/**
+	 * getLocationY, donne la coordonné en y
+	 * @return double
+	 */
 	double getLocationY() {
 		return moveY;
 	}
 	
+	/**
+	 * getEnd, Coordonnees finale
+	 * @return Location
+	 */
 	Location getEnd() {
 		return e;
 	}
-
+	
+	/**
+	 * getStart coordonnees de départ
+	 * @return Location
+	 */
 	Location getStart() {
 		return s;
 	}
 	
+	/**
+	 * isNul, permet de savoir si la pièce ce déplace 
+	 * @return boolean
+	 */
 	boolean isNul(){
 		return moveX == 0 && moveY == 0;
 	}

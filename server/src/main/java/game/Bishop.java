@@ -1,10 +1,15 @@
 package game;
-
+/**
+ * 
+ * Bishop Class
+ * Fou
+ *
+ */
 public class Bishop extends Chessman{
 	
 	/**
-	 * Constructeur
-	 * @param chessman
+	 * Constructor
+	 * @param Color
 	 */
 	Bishop(Color c){
 		super("Bishop", c);
