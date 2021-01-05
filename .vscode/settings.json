@@ -1,4 +1,5 @@
 {
+    "files.autoSave": "onFocusChange",
     "files.exclude": {
         "**/.classpath": true,
         "**/.project": true,
@@ -6,10 +7,9 @@
         "**/.factorypath": true,
         "**/target/": true,
     },
-    "java.configuration.updateBuildConfiguration": "automatic",
-    "files.autoSave": "onFocusChange",
     "explorer.compactFolders": false,
     "workbench.editor.enablePreview": false,
     "workbench.editor.limit.enabled": true,
-    "workbench.editor.limit.value": 5
+    "workbench.editor.limit.value": 5,
+    "java.configuration.updateBuildConfiguration": "automatic"
 }
