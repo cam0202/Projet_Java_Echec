@@ -10,19 +10,19 @@ import chess.protocol.Message;
 
 public class TCPExchange {
 
-    public static void send(Socket socketTCP, Message message) throws IOException {
+    public static void send(Socket socketTCP, ExchangePacket packet) throws IOException {
         validateSocket(socketTCP);
 
-        if (message == null) {
-            throw new IllegalArgumentException("Message is null");
+        if (packet == null) {
+            throw new IllegalArgumentException("Packet is null");
         }
 
         BufferedOutputStream out = new BufferedOutputStream(socketTCP.getOutputStream());
-        out.write(message.getBytes());
+        out.write(packet.getMessage().getBytes());
         out.flush();
     }
 
-    public static Message receive(Socket socketTCP) throws IOException {
+    public static ExchangePacket receive(Socket socketTCP) throws IOException {
         validateSocket(socketTCP);
 
         BufferedInputStream in = new BufferedInputStream(socketTCP.getInputStream());
@@ -30,15 +30,15 @@ public class TCPExchange {
         byte[] header = new byte[Message.HEADER_SIZE];
         fillBufferFromStream(in, header);
 
-        Message message = new Message(header);
+        ExchangePacket p = new ExchangePacket(socketTCP, new Message(header));
 
-        byte[] payload = new byte[message.getAmountOfMissingDataBytes()];
+        byte[] payload = new byte[p.getMessage().getAmountOfMissingDataBytes()];
         if (payload.length > 0) {
             fillBufferFromStream(in, payload);
-            message.setDataBytes(payload);
+            p.getMessage().setDataBytes(payload);
         }
 
-        return message;
+        return p;
     }
 
     private static void validateSocket(Socket socketTCP) {

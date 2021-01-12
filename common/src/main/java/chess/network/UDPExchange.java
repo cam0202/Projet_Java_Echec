@@ -12,6 +12,10 @@ public class UDPExchange {
     public static void send(DatagramSocket socketUDP, ExchangePacket packet) throws IOException {
         validateSocket(socketUDP);
 
+        if (packet == null) {
+            throw new IllegalArgumentException("Packet is null");
+        }
+
         byte[] bytes = packet.getMessage().getBytes();
         DatagramPacket p = new DatagramPacket(bytes, bytes.length, packet.getAddress(), packet.getPort());
         socketUDP.send(p);

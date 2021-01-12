@@ -1,6 +1,8 @@
 package chess.network;
 
 import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 
 import chess.protocol.Message;
 
@@ -9,6 +11,10 @@ public class ExchangePacket {
     private InetAddress address;
     private int port;
     private Message message;
+
+    public ExchangePacket(Socket socket, Message message) {
+        this(socket.getInetAddress(), socket.getPort(), message);
+    }
 
     public ExchangePacket(InetAddress address, int port, Message message) {
         if (address == null) {

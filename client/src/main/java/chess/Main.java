@@ -2,7 +2,7 @@ package chess;
 
 // These shenanigans are required in order to "correctly" handle SIGINT in Java.
 // This class will simply wrap an App instance and propagate the interrupt signal
-// when received. The error code will 
+// when received.
 
 public class Main extends Thread {
     private static App app;
@@ -16,7 +16,7 @@ public class Main extends Thread {
                 // still better than destroying the VM
                 Main.app.interrupt();
                 Main.app.join(1000);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignore) {
             }
         }
     }

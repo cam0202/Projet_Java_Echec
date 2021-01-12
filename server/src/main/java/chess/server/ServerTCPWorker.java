@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
+import chess.network.ExchangePacket;
 import chess.network.TCPExchange;
 
 public class ServerTCPWorker extends ServerWorker implements Runnable {
@@ -20,8 +21,10 @@ public class ServerTCPWorker extends ServerWorker implements Runnable {
     public void run() {
         while (!Thread.interrupted()) {
             try {
+                ExchangePacket request = TCPExchange.receive(this.client);
+                ExchangePacket response = this.process(request);
+                TCPExchange.send(this.client, response);
 
-                TCPExchange.receive(this.client);
             } catch (IOException e) {
 
             }
