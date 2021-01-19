@@ -5,9 +5,11 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import chess.client.Client;
 import chess.network.ExchangePacket;
 import chess.network.UDPExchange;
 
@@ -15,9 +17,11 @@ public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
     private final int port;
+    private final HashMap<ServerTCPWorker, Client> clients;
 
     public Server(int port) {
         this.port = port;
+        this.clients = new HashMap<>();
     }
 
     public void loop() {

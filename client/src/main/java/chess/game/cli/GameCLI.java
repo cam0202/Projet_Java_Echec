@@ -38,6 +38,24 @@ public class GameCLI extends Game {
         } catch (Exception e) {
             LOGGER.debug("oui", e);
         }
+/*
+                      ┌──────── Chat ────────┐
+ 8 ██  ██  ██  ██     │                      │
+ 7   ██  ██  ██  ██   │                      │
+ 6 ██  ██  ██  ██     │                      │
+ 5   ██  ██  ██  ██   │                      │
+ 4 ██  ██  ██  ██     │                      │
+ 3   ██  ██  ██  ██   │                      │
+ 2 ██  ██  ██  ██     │                      │
+ 1   ██  ██  ██  ██   │                      │
+   a b c d e f g h    │ Ceci est un message  │
+                      └──────────────────────┘
+┌─ Your input ───────────────────────────────┐   
+└  
+*/
+
+
+
         /*
          * try { //this.currentScreen.things();
          * 
