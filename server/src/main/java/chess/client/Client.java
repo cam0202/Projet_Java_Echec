@@ -1,17 +1,26 @@
 package chess.client;
 
-import java.net.Socket;
 import java.util.UUID;
 
-
 public class Client {
+    private final UUID uuid;
+    private String name;
 
-    private UUID uuid;
+    public Client(final UUID uuid) {
+        this.uuid = uuid;
+        this.name = this.uuid.toString();
+    }
 
-    private final Socket socketTCP;
+    public UUID getUUID() {
+        return this.uuid;
+    }
 
-    public Client(final Socket socketTCP) {
-        this.socketTCP = socketTCP;
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

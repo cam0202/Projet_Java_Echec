@@ -1,18 +1,52 @@
 package chess.server;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import chess.client.Client;
 import chess.network.ExchangePacket;
+import chess.network.TCPExchange;
 import chess.protocol.Message;
 
-abstract class ServerWorker {
+public class ServerWorker implements Runnable {
     private final static Logger LOGGER = Logger.getLogger(ServerWorker.class);
 
-    public ExchangePacket process(ExchangePacket request) {
+    private final Socket socket;
+    private Client client;
+
+    public ServerWorker(Socket socket) {
+        this.socket = socket;
+        this.client = null;
+    }
+
+    @Override
+    public void run() {
+        while (!Thread.interrupted()) {
+            try {
+                ExchangePacket request = TCPExchange.receive(this.socket);
+                ExchangePacket response = this.process(request);
+                TCPExchange.send(this.socket, response);
+
+            } catch (IOException e) {
+                // TODO
+                LOGGER.debug(e);
+            }
+        }
+    }
+
+    // Shorthand function to generate an error message
+    private ExchangePacket error(String message) {
+        ExchangePacket packet = new ExchangePacket(this.socket, new Message(Message.Type.KO));
+        packet.getMessage().setData(message);
+        return packet;
+    }
+
+    private ExchangePacket process(ExchangePacket request) {
         LOGGER.debug("Processing message from [" + request.getAddress() + "]:" + request.getPort());
 
         switch (request.getMessage().getType()) {
@@ -26,26 +60,14 @@ abstract class ServerWorker {
                 return processDISCONNECT(request);
 
             default: {
-                ExchangePacket response = new ExchangePacket(request.getAddress(), request.getPort(),
-                        new Message(Message.Type.KO));
-                JSONObject root = new JSONObject();
-                root.put("error", "unknown message type");
-                response.getMessage().setData(root.toString());
-                return response;
+                return error("unknown message type");
             }
         }
     }
 
-    private ExchangePacket error(ExchangePacket request, String message) {
-        ExchangePacket packet = new ExchangePacket(request.getAddress(), request.getPort(),
-                new Message(Message.Type.KO));
-        packet.getMessage().setData(message);
-        return packet;
-    }
-
     private ExchangePacket processDISCOVER(ExchangePacket request) {
         if (request.getMessage().getData().length() <= 0) {
-            return error(request, "payload is empty");
+            return error("payload is empty");
         }
 
         int port = -1;
@@ -54,11 +76,11 @@ abstract class ServerWorker {
             JSONObject root = new JSONObject(request.getMessage().getData());
             port = root.getInt("port");
         } catch (JSONException e) {
-            return error(request, "failed to decode payload: " + e.getMessage());
+            return error("failed to decode payload: " + e.getMessage());
         }
 
         ExchangePacket response = new ExchangePacket(request.getAddress(), port, new Message(Message.Type.DISCOVER));
-        JSONObject root = new JSONObject();
+        JSONObject root = new JSONObject(); // TODO
         root.put("name", "TheJavaProject");
         root.put("description", "Serveur principal de jeu");
         root.put("online_players", 0);
@@ -71,7 +93,7 @@ abstract class ServerWorker {
 
     private ExchangePacket processCONNECT(ExchangePacket request) {
         if (request.getMessage().getData().length() <= 0) {
-            return error(request, "payload is empty");
+            return error("payload is empty");
         }
 
         UUID uuid = null;
@@ -79,43 +101,56 @@ abstract class ServerWorker {
 
         try {
             JSONObject root = new JSONObject(request.getMessage().getData());
-            uuid = UUID.fromString(root.getString("uuid"));
+            String uuidS = root.optString("uuid");
+            if (!uuidS.isEmpty()) {
+                uuid = UUID.fromString(root.getString("uuid"));
+            }
             name = root.getString("name");
-
         } catch (JSONException e) {
-            return error(request, "failed to decode payload: " + e.getMessage());
+            return error("failed to decode payload: " + e.getMessage());
         }
 
-        LOGGER.debug("User " + uuid.toString() + " joined the server");
+        if (client != null) {
+            return error("already connected");
+        }
 
-        ExchangePacket response = new ExchangePacket(request.getAddress(), request.getPort(),
-                new Message(Message.Type.OK));
+        Client client;
+
+        if (uuid == null) {
+            // NEW CLIENT
+            client = new Client(UUID.randomUUID());
+        } else {
+            // ATTEMPT TO RECONNECT CLIENT
+            // TODO
+            client = new Client(uuid);
+        }
+
+        client.setName(name);
+
+        ExchangePacket response = new ExchangePacket(this.socket, new Message(Message.Type.OK));
         JSONObject root = new JSONObject();
-        root.put("uuid", uuid.toString());
+        root.put("uuid", client.getUUID());
+        response.getMessage().setData(root.toString());
+
+        this.client = client;
+
+        LOGGER.debug("User " + this.client.getName() + " joined the server");
 
         return response;
     }
 
     private ExchangePacket processDISCONNECT(ExchangePacket request) {
-        if (request.getMessage().getData().length() <= 0) {
-            return error(request, "payload is empty");
+        if (request.getMessage().getData().length() > 0) {
+            return error("payload must be empty");
         }
 
-        UUID uuid = null;
-
-        try {
-            JSONObject root = new JSONObject(request.getMessage().getData());
-            uuid = UUID.fromString(root.getString("uuid"));
-
-        } catch (JSONException e) {
-            return error(request, "failed to decode payload: " + e.getMessage());
+        if (this.client == null) {
+            return error("not connected");
         }
 
-        LOGGER.debug("User " + uuid.toString() + " left the server");
+        LOGGER.debug("User " + this.client.getName() + " left the server");
 
-        ExchangePacket response = new ExchangePacket(request.getAddress(), request.getPort(),
-                new Message(Message.Type.OK));
-
+        ExchangePacket response = new ExchangePacket(this.socket, new Message(Message.Type.OK));
         return response;
     }
 }

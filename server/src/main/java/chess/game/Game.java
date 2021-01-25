@@ -1,4 +1,4 @@
-package game;
+package chess.game;
 /**
  * Class Game 
  * Elle permet de réprésenter le jeux.

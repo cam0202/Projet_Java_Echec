@@ -1,4 +1,4 @@
-package game;
+package chess.game;
 /**
  * Chessman Abstract Class
  * Point de départ de toute pièce du jeu

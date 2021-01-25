@@ -8,7 +8,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 
 import org.apache.log4j.Logger;
 
-import chess.Endpoint;
+import chess.Server;
 import chess.game.Game;
 
 public class GameCLI extends Game {
@@ -31,7 +31,7 @@ public class GameCLI extends Game {
     @Override
     public void loop() {
         try {
-            Endpoint server = new Endpoint(InetAddress.getByName("[::1]"), 12345);
+            Server server = new Server(InetAddress.getByName("[::1]"), 12345);
             server.connect();
             server.disconnect();
 

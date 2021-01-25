@@ -1,4 +1,4 @@
-package game;
+package chess.game;
 /**
  * Color Class
  * sert à l'utilisateur à faire un choix de couleur

@@ -3,7 +3,6 @@ package chess;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -15,17 +14,17 @@ import chess.protocol.Message;
 /**
  * This class wraps a TCP socket and provides useful protocol functions
  */
-public class Endpoint {
-    private static final Logger LOGGER = Logger.getLogger(Endpoint.class);
+public class Server {
+    private static final Logger LOGGER = Logger.getLogger(Server.class);
 
-    protected Socket socketTCP = null;
+    private final Socket socketTCP;
     private boolean connected = false;
 
-    public Endpoint(InetAddress address, int port) throws IOException {
+    public Server(final InetAddress address, final int port) throws IOException {
         this(new Socket(address, port));
     }
 
-    public Endpoint(Socket socketTCP) {
+    public Server(final Socket socketTCP) {
         if (socketTCP == null) {
             throw new IllegalArgumentException("TCP socket is null");
         }
@@ -39,12 +38,12 @@ public class Endpoint {
 
     public Message connect() throws IOException {
         if (this.connected) {
-            throw new IllegalStateException("Already connected to endpoint");
+            throw new IllegalStateException("already connected to server");
         }
 
         ExchangePacket request = new ExchangePacket(this.socketTCP, new Message(Message.Type.CONNECT));
         JSONObject root = new JSONObject();
-        root.put("uuid", UUID.randomUUID()); // TODO
+        root.putOpt("uuid", null); // TODO
         root.put("name", "Hahaha");
         request.getMessage().setData(root.toString());
 
@@ -52,7 +51,7 @@ public class Endpoint {
 
         ExchangePacket response = TCPExchange.receive(this.socketTCP);
         if (response.getMessage().getType() != Message.Type.OK) {
-            throw new IOException("failed to connect to endpoint: " + response.getMessage().getData());
+            throw new IOException("failed to connect to server: " + response.getMessage().getData());
         }
 
         this.connected = true;
@@ -62,19 +61,16 @@ public class Endpoint {
 
     public void disconnect() throws IOException {
         if (!this.connected) {
-            throw new IllegalStateException("already disconnected from endpoint");
+            throw new IllegalStateException("already disconnected from server");
         }
 
         ExchangePacket request = new ExchangePacket(this.socketTCP, new Message(Message.Type.DISCONNECT));
-        JSONObject root = new JSONObject();
-        root.put("uuid", UUID.randomUUID()); // TODO
-        request.getMessage().setData(root.toString());
         
         TCPExchange.send(this.socketTCP, request);
 
         ExchangePacket response = TCPExchange.receive(this.socketTCP);
         if (response.getMessage().getType() != Message.Type.OK) {
-            throw new IOException("failed to cleanly from endpoint: " + response.getMessage().getData());
+            throw new IOException("failed to cleanly from server: " + response.getMessage().getData());
         }
 
         this.connected = false;
