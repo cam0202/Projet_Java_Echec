@@ -10,11 +10,11 @@ import chess.protocol.Message;
 
 public class TCPExchange {
 
-    public static void send(Socket socketTCP, ExchangePacket packet) throws IOException {
+    public static void send(final Socket socketTCP, final ExchangePacket packet) throws IOException {
         validateSocket(socketTCP);
 
         if (packet == null) {
-            throw new IllegalArgumentException("Packet is null");
+            throw new IllegalArgumentException("packet is null");
         }
 
         BufferedOutputStream out = new BufferedOutputStream(socketTCP.getOutputStream());
@@ -22,7 +22,7 @@ public class TCPExchange {
         out.flush();
     }
 
-    public static ExchangePacket receive(Socket socketTCP) throws IOException {
+    public static ExchangePacket receive(final Socket socketTCP) throws IOException {
         validateSocket(socketTCP);
 
         BufferedInputStream in = new BufferedInputStream(socketTCP.getInputStream());
@@ -41,7 +41,7 @@ public class TCPExchange {
         return p;
     }
 
-    private static void validateSocket(Socket socketTCP) {
+    private static void validateSocket(final Socket socketTCP) {
         if (socketTCP == null) {
             throw new IllegalStateException("TCP socket is null");
         }
@@ -51,12 +51,12 @@ public class TCPExchange {
         }
     }
 
-    private static void fillBufferFromStream(InputStream stream, byte[] buffer) throws IOException {
+    private static void fillBufferFromStream(final InputStream stream, final byte[] buffer) throws IOException {
         int cursor = 0;
         while (cursor < buffer.length) {
             int r = stream.read(buffer, cursor, buffer.length - cursor);
             if (r == -1) {
-                throw new IOException("Failed to read bytes from stream");
+                throw new IOException("failed to read bytes from stream");
             } else {
                 cursor += r;
             }

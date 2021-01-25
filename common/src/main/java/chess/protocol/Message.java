@@ -24,7 +24,7 @@ public class Message {
     public static final int HEADER_SIZE = Integer.BYTES + Integer.BYTES;
     public static final int MAX_LENGTH = 4096;
 
-    private int type;
+    private final int type;
     private int length;
     private byte[] data;
 
@@ -34,9 +34,9 @@ public class Message {
         this.data = new byte[0];
     }
 
-    public Message(byte[] header) {
+    public Message(final byte[] header) {
         if (header.length < HEADER_SIZE) {
-            throw new IllegalArgumentException("Too few bytes for header");
+            throw new IllegalArgumentException("too few bytes for header");
         }
 
         ByteBuffer buffer = ByteBuffer.wrap(header);
@@ -44,10 +44,23 @@ public class Message {
         this.length = buffer.getInt();
 
         if (this.length > MAX_LENGTH - HEADER_SIZE) {
-            throw new IllegalArgumentException("Ill-formed header: payload too long");
+            throw new IllegalArgumentException("ill-formed header: payload too long");
         }
 
         this.data = new byte[0];
+    }
+
+    public void setData(final String data) {
+        this.setDataBytes(data.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void setDataBytes(final byte[] data) {
+        if (data.length > MAX_LENGTH - HEADER_SIZE) {
+            throw new IllegalArgumentException("message too long");
+        }
+
+        this.data = data;
+        this.length = this.data.length;
     }
 
     public int getType() {
@@ -68,7 +81,7 @@ public class Message {
 
     public byte[] getBytes() {
         if (this.getAmountOfMissingDataBytes() != 0) {
-            throw new IllegalStateException("Payload is incomplete");
+            throw new IllegalStateException("payload is incomplete");
         }
 
         byte[] bytes = new byte[HEADER_SIZE + data.length];
@@ -77,18 +90,5 @@ public class Message {
         buffer.putInt(this.length);
         buffer.put(this.data);
         return bytes;
-    }
-
-    public void setData(String data) {
-        this.setDataBytes(data.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public void setDataBytes(byte[] data) {
-        if (data.length > MAX_LENGTH - HEADER_SIZE) {
-            throw new IllegalArgumentException("Message too long");
-        }
-
-        this.data = data;
-        this.length = this.data.length;
     }
 }

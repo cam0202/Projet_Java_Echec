@@ -23,13 +23,13 @@ The default port for the server is UDP port `12345`.
         - `name`: a string representing the server's name
         - `description`: a string representing the server's description
         - `online_players`: an integer representing the current amount of connected players
+        - `max_online_players`: an integer representing the maximum amount of players the server can handle
 
 ## Connection-full messages
 - `CONNECT(100)`: Request connection to a server.
-    - A client's payload will contain the following mandatory fields:
-        - `name`: a string representing the client's display name
-    - A client's payload may contain the following optional fields:
+    - A client's payload can contain the following optional fields:
         - `uuid`: a string representing a unique identifier. This is used to uniquely identify a player and manage the session (reconnect when connection dropped etc.).
+        - `name`: a string representing the client's display name
     - A server's payload will contain the following mandatory fields:
         - `uuid`: a string representing a unique identifier. This must be present in the payload of every client request once the connection is established. If the client provided their own UUID, the client is trying to reestablished a lost connection. The server must try to reconnect the user, and will respond with the provided UUID on success, another UUID on failure.
         

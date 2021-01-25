@@ -2,31 +2,38 @@ package chess.network;
 
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 
 import chess.protocol.Message;
 
+/**
+ * This class wraps a message and a destination for compatibility between
+ * TCP and UDP transmisson methods
+ */
 public class ExchangePacket {
 
-    private InetAddress address;
-    private int port;
-    private Message message;
+    private final InetAddress address;
+    private final int port;
+    private final Message message;
 
-    public ExchangePacket(Socket socket, Message message) {
+    public ExchangePacket(final ExchangePacket template, final Message message) {
+        this(template.getAddress(), template.getPort(), message);
+    }
+
+    public ExchangePacket(final Socket socket, final Message message) {
         this(socket.getInetAddress(), socket.getPort(), message);
     }
 
-    public ExchangePacket(InetAddress address, int port, Message message) {
+    public ExchangePacket(final InetAddress address, final int port, final Message message) {
         if (address == null) {
-            throw new IllegalArgumentException("Destination address is null");
+            throw new IllegalArgumentException("destination address is null");
         }
 
         if (!(0 < port && port <= 65535)) {
-            throw new IllegalArgumentException("Invalid port " + port);
+            throw new IllegalArgumentException("invalid port " + port);
         }
 
         if (message == null) {
-            throw new IllegalArgumentException("Message is null");
+            throw new IllegalArgumentException("message is null");
         }
 
         this.address = address;

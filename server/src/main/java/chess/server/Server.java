@@ -1,64 +1,97 @@
 package chess.server;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import chess.client.Client;
+import chess.player.Player;
 
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
-    private HashSet<Client> online = new HashSet<>();
+    private final HashMap<UUID, Player> players = new HashMap<>();
 
     private final int port;
 
-    public Server(int port) {
+    public Server(final int port) {
         this.port = port;
     }
 
+    public void addPlayer(final UUID uuid, final Player player) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("uuid cannot be null");
+        }
+
+        if (player == null) {
+            throw new IllegalArgumentException("player cannot be null");
+        }
+
+        if (this.players.get(uuid) != null) {
+            throw new IllegalArgumentException("this player already exists");
+        }
+
+        this.players.put(uuid, player);
+    }
+    
+    public void removePlayer(final UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("uuid cannot be null");
+        }
+
+        this.players.remove(uuid);
+    }
+
     public String getName() {
-        return "The Chess Server";
+        return "The Chess Server"; // TODO
     }
 
     public String getDescription() {
-        return "Where everything is happening";
+        return "Where everything is happening"; // TODO
     }
 
     public int getOnlinePlayers() {
-        return this.online.size();
+        return this.players.size(); // TODO
+    }
+
+    public int getMaxOnlinePlayers() {
+        return chess.protocol.Server.DEFAULT_MAX_ONLINE_PLAYERS; // TODO
+    }
+
+    public Player getPlayer(final UUID uuid) {
+        return this.players.get(uuid);
     }
 
     public void loop() {
-        try (ServerSocket socketTCP = new ServerSocket(port)) {
-            // Set timeouts because accept() is blocking and
+        ListenerTCP listenerTCP = null;
+        ListenerUDP listenerUDP = null;
+
+        try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
+            // Set timeouts because accept() and receive() are blocking and
             // non-interruptible
             socketTCP.setSoTimeout(200);
+            socketUDP.setSoTimeout(200);
 
-            while (!Thread.interrupted()) {
-                // We create one thread per client to manage the socket
-                // This is a small app so it's fine, but we should consider creating a pool if
-                // we want to scale up
-                try {
-                    Socket clientSocket = socketTCP.accept();
-                    LOGGER.debug(
-                            "New TCP connection from client [" + clientSocket.getInetAddress() + "]:" + clientSocket.getPort());
+            listenerTCP = new ListenerTCP(this, socketTCP);
+            listenerTCP.start();
 
-                    Thread worker = new Thread(new ServerWorker(clientSocket));
-                    worker.setDaemon(true);
-                    worker.start();
+            listenerUDP = new ListenerUDP(this, socketUDP);
+            listenerUDP.start();
 
-                } catch (SocketTimeoutException ignore) {
-                } catch (IOException e) {
-                    LOGGER.error("Failed to accept new client", e);
-                }
-            }
+            listenerTCP.join();
+            listenerUDP.join();
+
+        } catch (InterruptedException e) {
+            if (listenerTCP != null)
+                listenerTCP.interrupt();
+            if (listenerUDP != null)
+                listenerUDP.interrupt();
+
         } catch (IOException e) {
-            LOGGER.fatal("Failed to create server socket", e);
+            LOGGER.fatal("Failed to create server sockets", e);
         }
     }
 }

@@ -1,12 +1,12 @@
-package chess.client;
+package chess.player;
 
 import java.util.UUID;
 
-public class Client {
+public class Player {
     private final UUID uuid;
     private String name;
 
-    public Client(final UUID uuid) {
+    public Player(final UUID uuid) {
         this.uuid = uuid;
         this.name = this.uuid.toString();
     }
