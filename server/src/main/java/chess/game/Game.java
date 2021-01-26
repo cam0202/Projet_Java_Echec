@@ -155,45 +155,46 @@ public class Game {
 	 * Bouge le pion
 	 * @param move
 	 */
-	String move(Move move) {
-		if(this.moveOk(move)) {
-			Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
-			if(c.isOk(move)) {
-				int x = move.getEnd().getColumn();
-				int y = move.getEnd().getRow();
-				this.setSquare(x, y, c);
-				this.cleanSquare(move.getStart().getColumn(),move.getStart().getRow());
-				String posX = "a";
-				switch((int)move.getLocationX()) {
-				case 0:
-					break;
-				case 1:
-					posX = "b";
-					break;
-				case 2:
-					posX = "c";
-					break;
-				case 3:
-					posX = "d";
-					break;
-				case 4:
-					posX = "e";
-					break;
-				case 5:
-					posX = "f";
-					break;
-				case 6:
-					posX = "g";
-					break;
-				}
-				return "Player " + c.getColor() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
-			}
+	String move(Move move) throws RuntimeException {
+		if(!this.moveOk(move)) {
+			throw new RuntimeException("Move not ok !");
 		}
 		
-		return "Move isn't ok";
-		
+		Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
+		if(!c.isOk(move)) {
+			throw new RuntimeException("Move not allowed to " + c.getName());
+		}
+			
+		int x = move.getEnd().getColumn();
+		int y = move.getEnd().getRow();
+		this.setSquare(x, y, c);
+		this.cleanSquare(move.getStart().getColumn(),move.getStart().getRow());
+		String posX = "a";
+		switch((int)move.getLocationX()) {
+			case 0:
+				break;
+			case 1:
+				posX = "b";
+				break;
+			case 2:
+				posX = "c";
+				break;
+			case 3:
+				posX = "d";
+				break;
+			case 4:
+				posX = "e";
+				break;
+			case 5:
+				posX = "f";
+				break;
+			case 6:
+				posX = "g";
+				break;
+			}
+		return "Player " + c.getColor() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
+				
 	}
 	
 	
-
 }
