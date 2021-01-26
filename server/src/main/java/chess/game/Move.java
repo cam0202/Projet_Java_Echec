@@ -78,4 +78,11 @@ public class Move {
 	boolean isNul(){
 		return moveX == 0 && moveY == 0;
 	}
+	
+	public Move createMove(String xs, int ys, String xe, int ye) {
+		Location start = (new Location()).createLocation(xs, ys);
+		Location end = (new Location()).createLocation(xe, ye);
+		return new Move(start, end);
+		
+	}
 }
