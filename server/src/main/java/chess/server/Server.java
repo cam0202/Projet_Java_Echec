@@ -8,15 +8,20 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import chess.game.Game;
+import chess.game.Color;
 import chess.player.Player;
+import chess.player.Room;
 
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
     private final HashMap<UUID, Player> players = new HashMap<>();
-    
+
     private final int port;
     private final UUID uuid;
+
+    private Room room = null; // TODO REMOVE
 
     public Server(final int port) {
         this.port = port;
@@ -47,8 +52,33 @@ public class Server {
         this.players.remove(uuid);
     }
 
+    // TODO: REMOVE
+    public void startRoom() {
+        Player p1 = null;
+        Player p2 = null;
+        int i = 0;
+        for (Player p : this.players.values()) {
+            if (i == 0)
+                p1 = p;
+            else if (i == 1)
+                p2 = p;
+            else
+                break;
+        }
+        this.room = new Room(p1, p2);
+    }
+
+    // TODO: REMOVE
+    public Room getRoom() {
+        return this.room;
+    }
+
     public UUID getUUID() {
         return this.uuid;
+    }
+
+    public int getPort() {
+        return this.port;
     }
 
     public String getName() {

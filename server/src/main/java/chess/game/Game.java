@@ -20,7 +20,7 @@ public class Game {
 	 * @param colorP1, couleur du joueur 1
 	 * @param colorP2, couleur du joueur 2
 	 */
-	Game(Color colorP1, Color colorP2){
+	public Game(Color colorP1, Color colorP2){
 		// init des 64 case de l'échequier
 		this.chess = new Square[8][8] ;
 		// création des case de l'échequier 

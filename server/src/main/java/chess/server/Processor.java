@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import chess.game.Color;
 import chess.network.ExchangePacket;
 import chess.player.Player;
 import chess.protocol.Message;
@@ -74,6 +75,9 @@ class Processor {
 
             case Message.Type.DISCONNECT:
                 return processDISCONNECT(request);
+
+            case Message.Type.MOVE:
+                return processMOVE(request);
 
             default: {
                 return new ExchangePacket(request, this.error("unknown message type"));
@@ -161,6 +165,12 @@ class Processor {
 
         LOGGER.debug("User " + player.getName() + " joined the server");
 
+        // TODO: REMOVE THIS UGLINESS
+        if (this.server.getOnlinePlayers() == 2) {
+            LOGGER.debug("Starting game");
+            this.server.startRoom();
+        }
+
         return new ExchangePacket(request, response);
     }
 
@@ -183,12 +193,38 @@ class Processor {
             return new ExchangePacket(request, this.error("not connected"));
         }
 
-        Message response = new Message(Message.Type.OK);
-
         this.server.removePlayer(uuid);
 
         LOGGER.debug("User " + player.getName() + " left the server");
 
-        return new ExchangePacket(request, response);
+        return new ExchangePacket(request, new Message(Message.Type.OK));
+    }
+
+    private ExchangePacket processMOVE(final ExchangePacket request) {
+        if (request.getMessage().getData().length() <= 0) {
+            return new ExchangePacket(request, this.error("payload is empty"));
+        }
+
+        UUID uuid = null;
+        String command = null;
+        try {
+            JSONObject root = new JSONObject(request.getMessage().getData());
+            uuid = this.decodeUUID(root);
+            command = root.getString("command");
+        } catch (JSONException e) {
+            return new ExchangePacket(request, this.error("failed to decode payload: " + e.getMessage()));
+        }
+
+        Player player = this.server.getPlayer(uuid);
+
+        if (player == null) {
+            return new ExchangePacket(request, this.error("not connected"));
+        }
+
+        // TODO HANDLE ROOMS
+
+        // TODO EXEC
+
+        return new ExchangePacket(request, new Message(Message.Type.OK));
     }
 }

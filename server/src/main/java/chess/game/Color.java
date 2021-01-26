@@ -13,63 +13,63 @@ public class Color {
 	/**
 	 *  Constructor
 	 */
-	Color(){
+	public Color(){
 		color = null;
 	}
 	
 	/**
 	 * green, choix de la couleur verte
 	 */
-	void Green() { 
+	public void Green() { 
 		this.color = "green";
 	}
 	
 	/**
 	 * blue, choix de la couleur bleu
 	 */
-	void Blue() { 
+	public void Blue() { 
 		this.color = "blue";
 	}
 	
 	/**
 	 * red, choix de la couleur rouge
 	 */
-	void Red() { 
+	public void Red() { 
 		this.color = "red";
 	}
 	
 	/**
 	 * black, choix de la couleur noire
 	 */
-	void Black() { 
+	public void Black() { 
 		this.color = "black";
 	}
 	
 	/**
 	 * white, choix de la couleur blanc
 	 */
-	void White() { 
+	public void White() { 
 		this.color = "white";
 	}
 	
 	/**
 	 * yellow, choix de la couleur jaune
 	 */
-	void Yellow() {
+	public void Yellow() {
 		this.color = "yellow";
 	}
 	
 	/**
 	 * orange, choix de la couleur orange
 	 */
-	void Orange() {
+	public void Orange() {
 		this.color = "orange";
 	}
 	
 	/**
 	 * violet, choix de la couleur violet
 	 */
-	void Violet() {
+	public void Violet() {
 		this.color = "violet";
 	}
 	
@@ -77,7 +77,7 @@ public class Color {
 	 * getColor, récupère la couleur
 	 * @return color 
 	 */
-	String getColor() {
+	public String getColor() {
 		return this.color;
 	}
 }
