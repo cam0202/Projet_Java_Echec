@@ -161,6 +161,7 @@ public class Game {
 		}
 		
 		Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
+		
 		if(colorJ.getColor() != c.getColor()) {
 			throw new RuntimeException("The pawn isn't yours !");
 		}

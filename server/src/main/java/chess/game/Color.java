@@ -14,7 +14,14 @@ public class Color {
 	 *  Constructor
 	 */
 	Color(){
-		color = null;
+		this.color = null;
+	}
+	
+	/**
+	 *  Constructor
+	 */
+	Color(String color){
+		this.color = color;
 	}
 	
 	/**
