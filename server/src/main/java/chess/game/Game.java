@@ -155,7 +155,7 @@ public class Game {
 	 * Bouge le pion
 	 * @param move
 	 */
-	String move(Color colorJ,Move move) throws RuntimeException {
+	public String move(Color colorJ,Move move) throws RuntimeException {
 		if(!this.moveOk(move)) {
 			throw new RuntimeException("Move not ok !");
 		}

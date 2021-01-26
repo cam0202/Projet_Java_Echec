@@ -5,18 +5,10 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -187,5 +179,33 @@ public class Server {
 
         this.clientUUID = null;
         this.connected = false;
+    }
+
+    // TODO: REMOVE
+    public void move(String command) throws IOException {
+        if (command == null) {
+            throw new IllegalArgumentException("command is null");
+        }
+
+        if (!this.connected) {
+            throw new IllegalStateException("not connected");
+        }
+
+        Message request = new Message(Message.Type.MOVE);
+        try {
+            JSONObject root = new JSONObject();
+            root.put("uuid", this.clientUUID.toString());
+            root.put("command", command);
+            request.setData(root.toString());
+        } catch (JSONException e) {
+            throw new IOException("failed to create request");
+        }
+
+        TCPExchange.send(this.socketTCP, new ExchangePacket(this.socketTCP, request));
+
+        Message response = TCPExchange.receive(this.socketTCP).getMessage();
+        if (response.getType() != Message.Type.OK) {
+            throw new IOException("failed to move: " + response.getData());
+        }
     }
 }

@@ -8,10 +8,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import chess.game.Game;
-import chess.game.Color;
 import chess.player.Player;
-import chess.player.Room;
+import chess.player.RoomForStep1;
 
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
@@ -21,7 +19,7 @@ public class Server {
     private final int port;
     private final UUID uuid;
 
-    private Room room = null; // TODO REMOVE
+    private RoomForStep1 room = null; // TODO REMOVE
 
     public Server(final int port) {
         this.port = port;
@@ -53,7 +51,7 @@ public class Server {
     }
 
     // TODO: REMOVE
-    public void startRoom() {
+    public void startRoomForStep1() {
         Player p1 = null;
         Player p2 = null;
         int i = 0;
@@ -64,12 +62,13 @@ public class Server {
                 p2 = p;
             else
                 break;
+            i++;
         }
-        this.room = new Room(p1, p2);
+        this.room = new RoomForStep1(p1, p2);
     }
 
     // TODO: REMOVE
-    public Room getRoom() {
+    public RoomForStep1 getRoomForStep1() {
         return this.room;
     }
 

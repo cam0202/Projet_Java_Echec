@@ -33,16 +33,36 @@ public class GameCLI extends Game {
 
     @Override
     public void loop() {
+        // This code is ulgy but it's just for testing purposes
+        InetAddress address = null;
+        int port = 0;
         try {
+            LOGGER.debug("Discovering servers.........");
             Collection<ExchangePacket> servers = Server.discover();
             for (ExchangePacket s : servers) {
-                LOGGER.debug("[" + s.getAddress() + "]:" + s.getPort() + " -> " + s.getMessage().getData());
+                LOGGER.debug(
+                        "Selecting server [" + s.getAddress() + "]:" + s.getPort() + " -> " + s.getMessage().getData());
+                address = s.getAddress();
+                port = s.getPort();
+                break;
             }
-
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
+        try {
+            Server server = new Server(address, port);
+            server.connect();
+            Thread.sleep(5000);
+            server.move("a5a6");
+            Thread.sleep(5000);
+            server.disconnect();
+        } catch (IOException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         /*
          * ┌──────── Chat ────────┐ 8 ██ ██ ██ ██ │ │ 7 ██ ██ ██ ██ │ │ 6 ██ ██ ██ ██ │
          * │ 5 ██ ██ ██ ██ │ │ 4 ██ ██ ██ ██ │ │ 3 ██ ██ ██ ██ │ │ 2 ██ ██ ██ ██ │ │ 1

@@ -159,6 +159,7 @@ class Processor {
             if (this.server.getOnlinePlayers() < this.server.getMaxOnlinePlayers()) {
                 this.server.addPlayer(uuid, player);
             } else {
+                LOGGER.debug("Cannot accept new player because server reached max player limit");
                 return new ExchangePacket(request, this.error("server is full"));
             }
         }
@@ -168,7 +169,7 @@ class Processor {
         // TODO: REMOVE THIS UGLINESS
         if (this.server.getOnlinePlayers() == 2) {
             LOGGER.debug("Starting game");
-            this.server.startRoom();
+            this.server.startRoomForStep1();
         }
 
         return new ExchangePacket(request, response);
@@ -224,6 +225,8 @@ class Processor {
         // TODO HANDLE ROOMS
 
         // TODO EXEC
+        // TODO: REMOVE
+        this.server.getRoomForStep1().doCommand(player, command);
 
         return new ExchangePacket(request, new Message(Message.Type.OK));
     }
