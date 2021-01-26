@@ -38,6 +38,8 @@ public class Move {
 		this.moveX = end.getColumn() - start.getColumn();
 		this.moveY = end.getRow() - start.getRow();
 	}
+	
+	
 
 	/**
 	 * getLocationX, donne la coordonné en x
@@ -78,4 +80,5 @@ public class Move {
 	boolean isNul(){
 		return moveX == 0 && moveY == 0;
 	}
+	
 }

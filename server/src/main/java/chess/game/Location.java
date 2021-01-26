@@ -24,7 +24,6 @@ public class Location {
 		this.r = row;
 		this.c = column;
 	}
-	
 	/**
 	 * getRow, position en y
 	 * @return int y
@@ -54,5 +53,6 @@ public class Location {
 	void setColumn(int newColumn) {
 		this.c = newColumn;
 	}
+	
 	
 }
