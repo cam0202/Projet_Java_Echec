@@ -200,6 +200,39 @@ public class Game {
 		return "Player " + c.getColor() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
 				
 	}
+	public Location createLocation(String X, int posY) {
+		int posX = 0;
+		switch(X) {
+			case "a":
+				break;
+			case "b":
+				posX = 1;
+				break;
+			case "c":
+				posX = 2;
+				break;
+			case "d":
+				posX = 3;
+				break;
+			case "e":
+				posX = 4;
+				break;
+			case "f":
+				posX = 5;
+				break;
+			case "g":
+				posX = 6;
+				break;
+		}
+		return new Location(posX, posY);
+	}
+	
+	public Move createMove(String xs, int ys, String xe, int ye) {
+		Location start = this.createLocation(xs, ys);
+		Location end = this.createLocation(xe, ye);
+		return new Move(start, end);
+		
+	}
 	
 	
 }

@@ -24,9 +24,6 @@ public class Location {
 		this.r = row;
 		this.c = column;
 	}
-	Location(){
-	}
-	
 	/**
 	 * getRow, position en y
 	 * @return int y
@@ -57,31 +54,5 @@ public class Location {
 		this.c = newColumn;
 	}
 	
-	public Location createLocation(String X, int posY) {
-		int posX = 0;
-		switch(X) {
-			case "a":
-				break;
-			case "b":
-				posX = 1;
-				break;
-			case "c":
-				posX = 2;
-				break;
-			case "d":
-				posX = 3;
-				break;
-			case "e":
-				posX = 4;
-				break;
-			case "f":
-				posX = 5;
-				break;
-			case "g":
-				posX = 6;
-				break;
-		}
-		return (new Location(posX, posY));
-	}
 	
 }
