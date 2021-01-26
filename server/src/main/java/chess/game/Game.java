@@ -155,7 +155,7 @@ public class Game {
 	 * Bouge le pion
 	 * @param move
 	 */
-	void move(Move move) {
+	String move(Move move) {
 		if(this.moveOk(move)) {
 			Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
 			if(c.isOk(move)) {
@@ -163,10 +163,37 @@ public class Game {
 				int y = move.getEnd().getRow();
 				this.setSquare(x, y, c);
 				this.cleanSquare(move.getStart().getColumn(),move.getStart().getRow());
+				String posX = "a";
+				switch((int)move.getLocationX()) {
+				case 0:
+					break;
+				case 1:
+					posX = "b";
+					break;
+				case 2:
+					posX = "c";
+					break;
+				case 3:
+					posX = "d";
+					break;
+				case 4:
+					posX = "e";
+					break;
+				case 5:
+					posX = "f";
+					break;
+				case 6:
+					posX = "g";
+					break;
+				}
+				return "Player " + c.getColor() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
 			}
 		}
 		
+		return "Move isn't ok";
+		
 	}
+	
 	
 
 }
