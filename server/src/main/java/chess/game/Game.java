@@ -155,12 +155,16 @@ public class Game {
 	 * Bouge le pion
 	 * @param move
 	 */
-	String move(Move move) throws RuntimeException {
+	String move(Color colorJ,Move move) throws RuntimeException {
 		if(!this.moveOk(move)) {
 			throw new RuntimeException("Move not ok !");
 		}
 		
 		Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
+		if(colorJ.getColor() != c.getColor()) {
+			throw new RuntimeException("The pawn isn't yours !");
+		}
+		
 		if(!c.isOk(move)) {
 			throw new RuntimeException("Move not allowed to " + c.getName());
 		}
