@@ -112,7 +112,7 @@ public class GameTest {
 		Move m1 = new Move(new Location(3,1), new Location(3,3));
 		assertEquals(this.g.getSquare(3,1).isTaken(),true);
 		assertEquals(this.g.getSquare(3,3).isTaken(),false);
-		this.g.move(m1);
+		this.g.move(this.c1,m1);
 		assertEquals(this.g.getSquare(3,1).isTaken(),false);
 		assertEquals(this.g.getSquare(3,3).isTaken(),true);
 	}
