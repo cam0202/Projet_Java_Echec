@@ -2,14 +2,17 @@ package chess.game.cli;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.util.Collection;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import org.apache.log4j.Logger;
 
-import chess.Server;
+import chess.server.Server;
 import chess.game.Game;
+import chess.network.ExchangePacket;
 
 public class GameCLI extends Game {
     private static final Logger LOGGER = Logger.getLogger(GameCLI.class);
@@ -31,30 +34,21 @@ public class GameCLI extends Game {
     @Override
     public void loop() {
         try {
-            Server server = new Server(InetAddress.getByName("[::1]"), 12345);
-            server.connect();
-            server.disconnect();
+            Collection<ExchangePacket> servers = Server.discover();
+            for (ExchangePacket s : servers) {
+                LOGGER.debug("[" + s.getAddress() + "]:" + s.getPort() + " -> " + s.getMessage().getData());
+            }
 
-        } catch (Exception e) {
-            LOGGER.debug("oui", e);
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
-/*
-                      ┌──────── Chat ────────┐
- 8 ██  ██  ██  ██     │                      │
- 7   ██  ██  ██  ██   │                      │
- 6 ██  ██  ██  ██     │                      │
- 5   ██  ██  ██  ██   │                      │
- 4 ██  ██  ██  ██     │                      │
- 3   ██  ██  ██  ██   │                      │
- 2 ██  ██  ██  ██     │                      │
- 1   ██  ██  ██  ██   │                      │
-   a b c d e f g h    │ Ceci est un message  │
-                      └──────────────────────┘
-┌─ Your input ───────────────────────────────┐   
-└  
-*/
-
-
+        /*
+         * ┌──────── Chat ────────┐ 8 ██ ██ ██ ██ │ │ 7 ██ ██ ██ ██ │ │ 6 ██ ██ ██ ██ │
+         * │ 5 ██ ██ ██ ██ │ │ 4 ██ ██ ██ ██ │ │ 3 ██ ██ ██ ██ │ │ 2 ██ ██ ██ ██ │ │ 1
+         * ██ ██ ██ ██ │ │ a b c d e f g h │ Ceci est un message │
+         * └──────────────────────┘ ┌─ Your input ───────────────────────────────┐ └
+         */
 
         /*
          * try { //this.currentScreen.things();

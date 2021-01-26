@@ -14,11 +14,13 @@ public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
     private final HashMap<UUID, Player> players = new HashMap<>();
-
+    
     private final int port;
+    private final UUID uuid;
 
     public Server(final int port) {
         this.port = port;
+        this.uuid = UUID.randomUUID();
     }
 
     public void addPlayer(final UUID uuid, final Player player) {
@@ -36,13 +38,17 @@ public class Server {
 
         this.players.put(uuid, player);
     }
-    
+
     public void removePlayer(final UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("uuid cannot be null");
         }
 
         this.players.remove(uuid);
+    }
+
+    public UUID getUUID() {
+        return this.uuid;
     }
 
     public String getName() {
@@ -71,27 +77,33 @@ public class Server {
 
         try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
             // Set timeouts because accept() and receive() are blocking and
-            // non-interruptible
+            // non-interruptible, but we want to be able to cleanly exit on SIGINT
             socketTCP.setSoTimeout(200);
             socketUDP.setSoTimeout(200);
 
             listenerTCP = new ListenerTCP(this, socketTCP);
             listenerTCP.start();
 
+            LOGGER.debug("Started TCP listener");
+
             listenerUDP = new ListenerUDP(this, socketUDP);
             listenerUDP.start();
+
+            LOGGER.debug("Started UDP listener");
 
             listenerTCP.join();
             listenerUDP.join();
 
         } catch (InterruptedException e) {
+            LOGGER.debug("Interrupting listeners...");
+
             if (listenerTCP != null)
                 listenerTCP.interrupt();
             if (listenerUDP != null)
                 listenerUDP.interrupt();
 
         } catch (IOException e) {
-            LOGGER.fatal("Failed to create server sockets", e);
+            LOGGER.fatal("Failed to create server listeners", e);
         }
     }
 }

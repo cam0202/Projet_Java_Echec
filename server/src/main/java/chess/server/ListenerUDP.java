@@ -27,16 +27,24 @@ final class ListenerUDP extends Listener {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
+            ExchangePacket request = null;
+
             try {
-                ExchangePacket request = UDPExchange.receive(this.socket);
-                Processor processor = new Processor(this.server);
-                ExchangePacket response = processor.process(request);
-
-                UDPExchange.send(this.socket, response);
-
+                request = UDPExchange.receive(this.socket);
             } catch (SocketTimeoutException ignore) {
+                continue;
             } catch (IOException e) {
-                LOGGER.error("Failed to process packet", e);
+                LOGGER.error("Failed to receive UDP packet", e);
+                continue;
+            }
+
+            Processor processor = new Processor(this.server);
+            ExchangePacket response = processor.process(request);
+
+            try {
+                UDPExchange.send(this.socket, response);
+            } catch (IOException e) {
+                LOGGER.error("Failed to send UDP packet", e);
             }
         }
     }

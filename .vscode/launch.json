@@ -30,7 +30,7 @@
             "type": "java",
             "name": "Debug (Launch)-App<server>",
             "request": "launch",
-            "mainClass": "chess.App",
+            "mainClass": "chess.Main",
             "projectName": "server",
             "preLaunchTask": "build_project"
         }

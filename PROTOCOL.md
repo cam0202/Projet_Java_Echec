@@ -20,6 +20,7 @@ The default port for the server is UDP port `12345`.
     - A client's payload will contain the following mandatory fields:
         - `port`: an integer representing the port the server should use to respond
     - A server's payload will contain the following mandatory fields:
+        - `uuid`: a unique identifier for this server (to help resolve duplicates)
         - `name`: a string representing the server's name
         - `description`: a string representing the server's description
         - `online_players`: an integer representing the current amount of connected players
@@ -33,4 +34,8 @@ The default port for the server is UDP port `12345`.
     - A server's payload will contain the following mandatory fields:
         - `uuid`: a string representing a unique identifier. This must be present in the payload of every client request once the connection is established. If the client provided their own UUID, the client is trying to reestablished a lost connection. The server must try to reconnect the user, and will respond with the provided UUID on success, another UUID on failure.
         
-- `DISCONNECT(101)`: 
+- `DISCONNECT(101)`: Request disconnect from a server.
+    - A client's payload will contain the following mandatory fields:
+        - `uuid`: a string representing the client's unique identifier
+    - A server's payload will be empty.
+

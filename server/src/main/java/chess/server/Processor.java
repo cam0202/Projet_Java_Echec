@@ -23,12 +23,6 @@ class Processor {
         this.server = server;
     }
 
-    /**
-     * Shorthand function to generate an error message
-     * 
-     * @param message Message wrap
-     * @return Wrapped message
-     */
     private Message error(final String message) {
         Message error = new Message(Message.Type.KO);
         error.setData(message);
@@ -36,15 +30,27 @@ class Processor {
     }
 
     private UUID decodeUUID(final JSONObject root) throws JSONException {
-        UUID uuid = null;
-        String s = root.optString("uuid");
-        if (s != null) {
-            uuid = UUID.fromString(s);
+        if (root == null) {
+            throw new IllegalArgumentException("root is null");
         }
-        return uuid;
+
+        try {
+            String s = root.getString("uuid");
+            return UUID.fromString(s);
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     private void encodeUUID(final JSONObject root, final UUID uuid) {
+        if (root == null) {
+            throw new IllegalArgumentException("root is null");
+        }
+
+        if (uuid == null) {
+            throw new IllegalArgumentException("uuid is null");
+        }
+
         root.put("uuid", uuid.toString());
     }
 
@@ -94,12 +100,15 @@ class Processor {
 
         Message response = new Message(Message.Type.DISCOVER);
         JSONObject root = new JSONObject(); // TODO
+        root.put("uuid", this.server.getUUID());
         root.put("name", this.server.getName());
         root.put("description", this.server.getDescription());
         root.put("online_players", this.server.getOnlinePlayers());
         root.put("max_online_players", this.server.getMaxOnlinePlayers());
 
         response.setData(root.toString());
+
+        LOGGER.debug("Discovery request from [" + request.getAddress() + "]:" + request.getPort());
 
         return new ExchangePacket(request.getAddress(), port, response);
     }
@@ -123,7 +132,8 @@ class Processor {
         Player player;
         if (uuid == null) {
             // Player does not provide a UUID: this is someone new
-            player = new Player(UUID.randomUUID());
+            uuid = UUID.randomUUID();
+            player = new Player(uuid);
             player.setName(name);
         } else {
             // Player provides a UUID: this player is attempting to get their
@@ -155,8 +165,8 @@ class Processor {
     }
 
     private ExchangePacket processDISCONNECT(final ExchangePacket request) {
-        if (request.getMessage().getData().length() > 0) {
-            return new ExchangePacket(request, this.error("payload must be empty"));
+        if (request.getMessage().getData().length() <= 0) {
+            return new ExchangePacket(request, this.error("payload is empty"));
         }
 
         UUID uuid = null;
