@@ -178,7 +178,7 @@ public class Game {
 		this.setSquare(x, y, c);
 		this.cleanSquare(move.getStart().getColumn(),move.getStart().getRow());
 		String posX = "a";
-		switch((int)move.getLocationX()) {
+		switch((int)move.getEnd().getColumn()) {
 			case 0:
 				break;
 			case 1:
@@ -200,7 +200,7 @@ public class Game {
 				posX = "g";
 				break;
 			}
-		return "Player " + c.getName() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
+		return "Player " + c.getName() + " move in ("+posX +","+ ((int)move.getEnd().getRow()+1) +")"; 
 				
 	}
 	
@@ -228,7 +228,7 @@ public class Game {
 				posX = 6;
 				break;
 		}
-		return new Location(posX, posY);
+		return new Location(posX, posY-1);
 	}
 	
 	public Move createMove(String xs, int ys, String xe, int ye) {
