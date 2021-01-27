@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * 
  * Rook Class
@@ -12,8 +13,8 @@ public class Rook extends Chessman{
 	 * Constructeur
 	 * @param Color
 	 */
-	Rook(Color c){
-		super("Rook", c);
+	Rook(Player p,int c){
+		super("Rook", p, c);
 	}
 
 	/**

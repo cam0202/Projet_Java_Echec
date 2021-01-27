@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * 
  * Queen Class 
@@ -11,8 +12,8 @@ public class Queen extends Chessman{
 	 * Constructor
 	 * @param color
 	 */
-	Queen(Color c){
-		super("Queen",c);
+	Queen(Player p, int c){
+		super("Queen", p, c);
 	}
 
 

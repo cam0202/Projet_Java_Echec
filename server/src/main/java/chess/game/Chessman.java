@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * Chessman Abstract Class
  * Point de départ de toute pièce du jeu
@@ -9,9 +10,13 @@ public abstract class Chessman {
 	 */
 	private String n;
 	/**
-	 * couleur de la pièce
+	 * player
 	 */
-	private String c; 
+	private Player player;
+	/**
+	 * num joueur
+	 */
+	private int c;
 	
 	/**
 	 * Chessman Constructor
@@ -19,9 +24,10 @@ public abstract class Chessman {
 	 * @param name
 	 * @param color
 	 */
-	Chessman(String name, Color color){
+	Chessman(String name, Player p,int i){
 		this.n = name;
-		this.c = color.getColor();
+		this.player = p;
+		this.c = i;
 	}
 	
 	/**
@@ -39,11 +45,11 @@ public abstract class Chessman {
 		return this.n;
 	}
 	
-	/**
-	 * getColor, récupération de la couleur 
-	 * @return String
-	 */
-	String getColor() {
+	Player getPlayer() {
+		return this.player;
+	}
+	
+	int getNumber() {
 		return this.c;
 	}
 	

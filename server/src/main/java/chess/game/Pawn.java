@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * 
  * Pawn Class
@@ -11,8 +12,8 @@ public class Pawn extends Chessman{
 	 * Pawn Constructor 
 	 * @param color
 	 */
-	Pawn(Color c){
-		super("Pawn", c);
+	Pawn(Player p, int c){
+		super("Pawn", p , c);
 	}
 
 	/**
@@ -30,7 +31,7 @@ public class Pawn extends Chessman{
 			 * noir, rouge, orange et violet 
 			 * cela nous permet de vérifier que le joueur un pourra avancer son pion qu'en direction de l'avant
 			 */
-			if(this.getColor().equals("black") || this.getColor().equals("red") || this.getColor().equals("orange") || this.getColor().equals("violet")) {
+			if(this.getNumber() == 0) {
 				/**
 				 * Lors du premier tour d'un pion on peu avancer de une ou deux case => 1 ? 2 : 1
 				 * de plus un déplacement sera positif dans ce cas 

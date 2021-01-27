@@ -1,4 +1,6 @@
 package chess.game;
+import chess.player.*;
+
 /**
  * Class Game 
  * Elle permet de réprésenter le jeux.
@@ -13,14 +15,14 @@ public class Game {
 	/**
 	 *  Tableau de couleur, permet de réprésenter la couleur des joueur.
 	 */
-	private Color[] colorPlayers;	
+	private Player[] players;	
 	/**
 	 * Game Constructor
 	 * Crée un tableau de 8x8 case et crée un tableau de 2 couleurs
 	 * @param colorP1, couleur du joueur 1
 	 * @param colorP2, couleur du joueur 2
 	 */
-	public Game(Color colorP1, Color colorP2){
+	public Game(Player p1, Player p2){
 		// init des 64 case de l'échequier
 		this.chess = new Square[8][8] ;
 		// création des case de l'échequier 
@@ -29,10 +31,11 @@ public class Game {
 				this.chess[column][row] = new Square();
 			}
 		}
-		// init couleur
-		this.colorPlayers = new Color[2] ;
-		this.colorPlayers[0] = colorP1 ;
-		this.colorPlayers[1] = colorP2 ;
+		
+		// init players
+		this.players = new Player[2];
+		this.players[0] = p1;
+		this.players[1] = p2;
 	}
 	
 	/**
@@ -41,7 +44,7 @@ public class Game {
 	 * @param row, y
 	 * @return la case de la position choisi
 	 */
-	private Square getSquare(int column, int row) {
+	Square getSquare(int column, int row) {
 		return this.chess[column][row];
 	}
 	
@@ -50,7 +53,7 @@ public class Game {
 	 * @param column, x
 	 * @param row, y
 	 */
-	private void cleanSquare(int column, int row) {
+	void cleanSquare(int column, int row) {
 		this.chess[column][row].setChessman(null);
 	}
 	
@@ -59,43 +62,43 @@ public class Game {
 	 * @param column, x
 	 * @param row, y
 	 */
-	private void setSquare(int column, int row, Chessman c) {
+	void setSquare(int column, int row, Chessman c) {
 		this.chess[row][column].setChessman(c);
 	}
 	
 	/**
 	 * startGame, initialise le plateau de jeu
 	 */
-	private void startGame(){
+	void startGame(){
 		// player 1
 		int row = 7;
 		
-		(this.chess[0][row]).setChessman(new Rook(this.colorPlayers[1])); 
-		(this.chess[1][row]).setChessman(new Knight(this.colorPlayers[1])); 
-		(this.chess[2][row]).setChessman(new Bishop(this.colorPlayers[1])); 
-		(this.chess[3][row]).setChessman(new Queen(this.colorPlayers[1])); 
-		(this.chess[4][row]).setChessman(new King(this.colorPlayers[1])); 
-		(this.chess[5][row]).setChessman(new Bishop(this.colorPlayers[1])); 
-		(this.chess[6][row]).setChessman(new Knight(this.colorPlayers[1])); 
-		(this.chess[7][row]).setChessman(new Rook(this.colorPlayers[1])); 
+		(this.chess[0][row]).setChessman(new Rook(this.players[1], 1)); 
+		(this.chess[1][row]).setChessman(new Knight(this.players[1], 1)); 
+		(this.chess[2][row]).setChessman(new Bishop(this.players[1], 1)); 
+		(this.chess[3][row]).setChessman(new Queen(this.players[1], 1)); 
+		(this.chess[4][row]).setChessman(new King(this.players[1], 1)); 
+		(this.chess[5][row]).setChessman(new Bishop(this.players[1], 1)); 
+		(this.chess[6][row]).setChessman(new Knight(this.players[1], 1)); 
+		(this.chess[7][row]).setChessman(new Rook(this.players[1], 1)); 
 			
 		for (int column = 0; column <= 7; column++) {
-			(chess[column][row-1]).setChessman(new Pawn(this.colorPlayers[1])); 
+			(chess[column][row-1]).setChessman(new Pawn(this.players[1], 1)); 
 		}
 
 		// payer 2
 		row = 0;
-		(this.chess[0][row]).setChessman(new Rook(this.colorPlayers[0])); 
-		(this.chess[1][row]).setChessman(new Knight(this.colorPlayers[0])); 
-		(this.chess[2][row]).setChessman(new Bishop(this.colorPlayers[0])); 
-		(this.chess[3][row]).setChessman(new Queen(this.colorPlayers[0])); 
-		(this.chess[4][row]).setChessman(new King(this.colorPlayers[0])); 
-		(this.chess[5][row]).setChessman(new Bishop(this.colorPlayers[0])); 
-		(this.chess[6][row]).setChessman(new Knight(this.colorPlayers[0])); 
-		(this.chess[7][row]).setChessman(new Rook(this.colorPlayers[0])); 
+		(this.chess[0][row]).setChessman(new Rook(this.players[0], 0)); 
+		(this.chess[1][row]).setChessman(new Knight(this.players[0], 0)); 
+		(this.chess[2][row]).setChessman(new Bishop(this.players[0], 0)); 
+		(this.chess[3][row]).setChessman(new Queen(this.players[0], 0)); 
+		(this.chess[4][row]).setChessman(new King(this.players[0], 0)); 
+		(this.chess[5][row]).setChessman(new Bishop(this.players[0], 0)); 
+		(this.chess[6][row]).setChessman(new Knight(this.players[0], 0)); 
+		(this.chess[7][row]).setChessman(new Rook(this.players[0], 0)); 
 			
 		for (int column = 0; column <= 7; column++) {
-			(this.chess[column][row+1]).setChessman(new Pawn(this.colorPlayers[0])); 
+			(this.chess[column][row+1]).setChessman(new Pawn(this.players[0], 0)); 
 		}
 		
 	}
@@ -105,7 +108,7 @@ public class Game {
 	 * @param move
 	 * @return true, false
 	 */
-	private boolean moveOk(Move move) {
+	boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger 
 		Chessman startChessman = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
 		// première condition la case doit être libre et que le movement ne soit pas null
@@ -155,14 +158,14 @@ public class Game {
 	 * Bouge le pion
 	 * @param move
 	 */
-	private String move(Color colorJ,Move move) throws RuntimeException {
+	public String move(Player p,Move move) throws RuntimeException {
 		if(!this.moveOk(move)) {
 			throw new RuntimeException("Move not ok !");
 		}
 		
 		Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
 		
-		if(colorJ.getColor() != c.getColor()) {
+		if(!p.getName().equals(c.getPlayer().getName())) {
 			throw new RuntimeException("The pawn isn't yours !");
 		}
 		
@@ -197,11 +200,11 @@ public class Game {
 				posX = "g";
 				break;
 			}
-		return "Player " + c.getColor() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
+		return "Player " + c.getName() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
 				
 	}
 	
-	private Location createLocation(String X, int posY) {
+	Location createLocation(String X, int posY) {
 		int posX = 0;
 		switch(X) {
 			case "a":

@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * 
  * Square Class
@@ -57,11 +58,11 @@ public class Square {
 	 * @param couleur
 	 * @return
 	 */
-	public boolean isTaken(String couleur)
+	public boolean isTaken(int player)
 	{
 		if (this.cm == null)
 			return false;
 		else
-			return (this.cm.getColor().equals(couleur));
+			return (this.cm.getNumber() == player);
 	}
 }
