@@ -20,7 +20,7 @@ public class Game {
 	 * @param colorP1, couleur du joueur 1
 	 * @param colorP2, couleur du joueur 2
 	 */
-	Game(Color colorP1, Color colorP2){
+	public Game(Color colorP1, Color colorP2){
 		// init des 64 case de l'échequier
 		this.chess = new Square[8][8] ;
 		// création des case de l'échequier 
@@ -41,7 +41,7 @@ public class Game {
 	 * @param row, y
 	 * @return la case de la position choisi
 	 */
-	Square getSquare(int column, int row) {
+	private Square getSquare(int column, int row) {
 		return this.chess[column][row];
 	}
 	
@@ -50,7 +50,7 @@ public class Game {
 	 * @param column, x
 	 * @param row, y
 	 */
-	void cleanSquare(int column, int row) {
+	private void cleanSquare(int column, int row) {
 		this.chess[column][row].setChessman(null);
 	}
 	
@@ -59,14 +59,14 @@ public class Game {
 	 * @param column, x
 	 * @param row, y
 	 */
-	void setSquare(int column, int row, Chessman c) {
+	private void setSquare(int column, int row, Chessman c) {
 		this.chess[row][column].setChessman(c);
 	}
 	
 	/**
 	 * startGame, initialise le plateau de jeu
 	 */
-	void startGame(){
+	private void startGame(){
 		// player 1
 		int row = 7;
 		
@@ -105,7 +105,7 @@ public class Game {
 	 * @param move
 	 * @return true, false
 	 */
-	boolean moveOk(Move move) {
+	private boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger 
 		Chessman startChessman = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
 		// première condition la case doit être libre et que le movement ne soit pas null
@@ -155,7 +155,7 @@ public class Game {
 	 * Bouge le pion
 	 * @param move
 	 */
-	String move(Color colorJ,Move move) throws RuntimeException {
+	private String move(Color colorJ,Move move) throws RuntimeException {
 		if(!this.moveOk(move)) {
 			throw new RuntimeException("Move not ok !");
 		}
@@ -200,7 +200,8 @@ public class Game {
 		return "Player " + c.getColor() + " move in ("+posX +","+ (int)move.getLocationY() +")"; 
 				
 	}
-	public Location createLocation(String X, int posY) {
+	
+	private Location createLocation(String X, int posY) {
 		int posX = 0;
 		switch(X) {
 			case "a":
