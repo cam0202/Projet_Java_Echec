@@ -93,7 +93,8 @@ public class Server {
         }
 
         try (DatagramSocket receiverSocket = new DatagramSocket()) {
-            receiverSocket.setSoTimeout(200);
+            receiverSocket.setSoTimeout(1000);
+
             Receiver receiver = new Receiver(receiverSocket);
             receiver.start();
 
@@ -107,11 +108,11 @@ public class Server {
                     throw new IOException("failed to create request");
                 }
 
+                LOGGER.debug(String.format("Discovering servers... (timeout: %sms)", receiverSocket.getSoTimeout()));
                 UDPExchange.send(senderSocket, new ExchangePacket(Inet4Address.getByName("255.255.255.255"),
                         chess.protocol.Server.DEFAULT_PORT, request));
                 UDPExchange.send(senderSocket, new ExchangePacket(Inet6Address.getByName("ff02::1"),
                         chess.protocol.Server.DEFAULT_PORT, request));
-                // TODO: ipv6 is sketchy there, fix this
             }
 
             try {

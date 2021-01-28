@@ -15,7 +15,7 @@ public class Player {
         this.name = this.uuid.toString();
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 

@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import chess.game.Color;
 import chess.network.ExchangePacket;
 import chess.player.Player;
+import chess.player.RoomForStep1;
 import chess.protocol.Message;
 
 /**
@@ -226,7 +226,11 @@ class Processor {
 
         // TODO EXEC
         // TODO: REMOVE
-        this.server.getRoomForStep1().doCommand(player, command);
+        RoomForStep1 room = this.server.getRoomForStep1();
+        if (room == null) {
+            return new ExchangePacket(request, this.error("game not started"));
+        }
+        room.doCommand(player, command);
 
         return new ExchangePacket(request, new Message(Message.Type.OK));
     }

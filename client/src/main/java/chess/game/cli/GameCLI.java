@@ -2,8 +2,8 @@ package chess.game.cli;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.Collection;
+import java.util.Scanner;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -33,34 +33,92 @@ public class GameCLI extends Game {
 
     @Override
     public void loop() {
-        // This code is ulgy but it's just for testing purposes
-        InetAddress address = null;
-        int port = 0;
         try {
-            LOGGER.debug("Discovering servers.........");
-            Collection<ExchangePacket> servers = Server.discover();
-            for (ExchangePacket s : servers) {
-                LOGGER.debug(
-                        "Selecting server [" + s.getAddress() + "]:" + s.getPort() + " -> " + s.getMessage().getData());
-                address = s.getAddress();
-                port = s.getPort();
-                break;
-            }
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+            Scanner scanner = new Scanner(System.in);
+            Server server = null;
 
-        try {
-            Server server = new Server(address, port);
-            server.connect();
-            Thread.sleep(5000);
-            server.move("a5a6");
-            Thread.sleep(5000);
-            server.disconnect();
-        } catch (IOException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            boolean run = true;
+            while (run) {
+                String command = scanner.next();
+                switch (command) {
+                    case "stop": {
+                        if (server != null) {
+                            server.disconnect();
+                        }
+                        run = false;
+                        break;
+                    }
+                    case "connect": {
+                        if (server != null) {
+                            System.err.println("Already connected to a server!");
+                            break;
+                        }
+
+                        InetAddress address = null;
+                        int port = 0;
+                        Collection<ExchangePacket> servers = null;
+                        for (int i = 0; i < 5; i++) {
+                            servers = Server.discover();
+                            if (servers.size() > 0) {
+                                break;
+                            }
+                        }
+
+                        if (servers == null || servers.isEmpty()) {
+                            System.err.println("Failed to discover");
+                            break;
+                        }
+
+                        for (ExchangePacket s : servers) {
+                            System.out.println("Selecting server [" + s.getAddress() + "]:" + s.getPort() + " -> "
+                                    + s.getMessage().getData());
+                            address = s.getAddress();
+                            port = s.getPort();
+                            break; // Select the first one for now
+                        }
+
+                        if (address == null) {
+                            System.err.println("No servers found");
+                            break;
+                        }
+
+                        server = new Server(address, port);
+                        server.connect();
+                        break;
+                    }
+
+                    case "disconnect": {
+                        if (server != null) {
+                            server.disconnect();
+                            server = null;
+                            System.out.println("Disconnecting");
+                        } else {
+                            System.err.println("Not connected!");
+                        }
+                        break;
+                    }
+
+                    case "move": {
+                        if (server == null) {
+                            System.err.println("Not connected!");
+                            break;
+                        }
+
+                        System.out.print("Enter your move: ");
+                        command = scanner.next();
+                        server.move(command);
+                        System.out.println();
+                        break;
+                    }
+
+                    default: {
+                        System.err.println("Unknown command!");
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.fatal(e);
         }
 
         /*

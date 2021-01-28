@@ -6,17 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Main",
-            "request": "launch",
-            "mainClass": "chess.Main",
-            "projectName": "client"
-        },
-        {
-            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "preLaunchTask": "build_project"
         },
         {
             "type": "java",
@@ -24,7 +16,6 @@
             "request": "launch",
             "mainClass": "chess.Main",
             "projectName": "client",
-            "preLaunchTask": "build_project"
         },
         {
             "type": "java",
@@ -32,7 +23,6 @@
             "request": "launch",
             "mainClass": "chess.Main",
             "projectName": "server",
-            "preLaunchTask": "build_project"
         }
     ]
 }
