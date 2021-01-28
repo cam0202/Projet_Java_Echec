@@ -1,22 +1,28 @@
 package chess.game;
+import chess.player.*;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
+
 public class GameTest {
 	
 	Game g;
-	Color c1;
-	Color c2;
+	Player c1;
+	Player c2;
 
+
+	
+	@SuppressWarnings("static-access")
 	@Before
 	public void setUp() throws Exception {
-		this.c1 = new Color();
-		this.c1.Black();
-		this.c2 = new Color();
-		this.c2.White();
+		this.c1 = new Player(UUID.randomUUID());
+		this.c2 = new Player(UUID.randomUUID());
+		this.c1.setName("cam");
+		this.c1.setName("hugo");
 		this.g = new Game(c1, c2);
 	}
 	
@@ -58,7 +64,7 @@ public class GameTest {
 	@Test 
 	public void testSetSquare() {
 		assertEquals(this.g.getSquare(4,4).isTaken(),false);
-		this.g.setSquare(4, 4, new Pawn(this.c1));
+		this.g.setSquare(4, 4, new Pawn(this.c1, 0));
 		assertEquals(this.g.getSquare(4,4).isTaken(),true);
 		
 	}
@@ -112,7 +118,8 @@ public class GameTest {
 		Move m1 = new Move(new Location(3,1), new Location(3,3));
 		assertEquals(this.g.getSquare(3,1).isTaken(),true);
 		assertEquals(this.g.getSquare(3,3).isTaken(),false);
-		this.g.move(this.c1,m1);
+		
+		System.out.println(this.g.move(this.c1,m1));
 		assertEquals(this.g.getSquare(3,1).isTaken(),false);
 		assertEquals(this.g.getSquare(3,3).isTaken(),true);
 	}

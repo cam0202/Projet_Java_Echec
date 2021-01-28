@@ -2,7 +2,6 @@ package chess.player;
 
 import org.apache.log4j.Logger;
 
-import chess.game.Color;
 import chess.game.Game;
 
 public class RoomForStep1 {
@@ -16,13 +15,7 @@ public class RoomForStep1 {
     public RoomForStep1(final Player player1, final Player player2) {
         this.player1 = player1;
         this.player2 = player2;
-
-        Color c1 = new Color("white");
-        Color c2 = new Color("black");
-        this.player1.color = c1;
-        this.player2.color = c2;
-
-        this.board = new Game(c1, c2);
+        this.board = new Game(player1, player2);
     }
 
     public void doCommand(Player player, String command) {

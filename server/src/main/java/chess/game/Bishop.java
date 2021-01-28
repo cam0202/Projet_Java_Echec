@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * 
  * Bishop Class
@@ -11,8 +12,8 @@ public class Bishop extends Chessman{
 	 * Constructor
 	 * @param Color
 	 */
-	Bishop(Color c){
-		super("Bishop", c);
+	Bishop(Player p,int c){
+		super("Bishop",p, c);
 	}
 
 	@Override

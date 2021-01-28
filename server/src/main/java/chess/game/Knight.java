@@ -1,4 +1,5 @@
 package chess.game;
+import chess.player.*;
 /**
  * 
  * Knight Class
@@ -11,8 +12,8 @@ public class Knight extends Chessman{
 	 * Constructor
 	 * @param Color
 	 */
-	Knight(Color c){
-		super("Knight", c);
+	Knight(Player p, int c){
+		super("Knight",p, c);
 	}
 	
 	/**
