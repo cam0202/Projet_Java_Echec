@@ -18,8 +18,7 @@ The default port for the server is UDP port `12345`.
 
 ## Connection-less messages
 - `DISCOVER(100)`: Usually sent to the broadcast address (on the default port). Allows discovery of servers on the local network.
-    - A client's payload will contain the following mandatory fields:
-        - `port`: an integer representing the port the server should use to respond
+    - A client's payload will be empty.
     - A server's payload will contain the following mandatory fields:
         - `uuid`: a unique identifier for this server (to help resolve duplicates)
         - `name`: a string representing the server's name

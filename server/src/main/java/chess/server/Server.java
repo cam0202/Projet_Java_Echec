@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import chess.player.Player;
-import chess.player.RoomForStep1;
 
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
@@ -55,7 +54,7 @@ public class Server {
         Player p1 = null;
         Player p2 = null;
         int i = 0;
-        for (Player p : this.players.values()) {
+        for (Player p : this.players.values()) { // Get first two players
             if (i == 0)
                 p1 = p;
             else if (i == 1)
@@ -65,6 +64,11 @@ public class Server {
             i++;
         }
         this.room = new RoomForStep1(p1, p2);
+    }
+
+    // TODO: remove
+    public void endRoomForStep1() {
+        this.room = null;
     }
 
     // TODO: REMOVE
@@ -81,11 +85,11 @@ public class Server {
     }
 
     public String getName() {
-        return "The Chess Server"; // TODO
+        return "The Main Server"; // TODO
     }
 
     public String getDescription() {
-        return "Where everything is happening"; // TODO
+        return "The is the main chess server"; // TODO
     }
 
     public int getOnlinePlayers() {
@@ -106,7 +110,8 @@ public class Server {
 
         try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
             // Set timeouts because accept() and receive() are blocking and
-            // non-interruptible, but we want to be able to cleanly exit on SIGINT
+            // non-interruptible, but we want to be able to cleanly exit on SIGINT so we
+            // need a little bit of polling
             socketTCP.setSoTimeout(200);
             socketUDP.setSoTimeout(200);
 

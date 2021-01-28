@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import chess.network.ExchangePacket;
 import chess.player.Player;
-import chess.player.RoomForStep1;
 import chess.protocol.Message;
 
 /**
@@ -86,20 +85,8 @@ class Processor {
     }
 
     private ExchangePacket processDISCOVER(final ExchangePacket request) {
-        if (request.getMessage().getData().length() <= 0) {
-            // Request does not provide a response port, and we know the player
-            // won't listen on the port we know, so just ignore it
-            return null;
-        }
-
-        int port = -1;
-
-        try {
-            JSONObject root = new JSONObject(request.getMessage().getData());
-            port = root.getInt("port");
-        } catch (JSONException e) {
-            // Again, we could not decode the response port, so we can't respond
-            return null;
+        if (request.getMessage().getData().length() > 0) {
+            return new ExchangePacket(request, this.error("payload must be empty"));
         }
 
         Message response = new Message(Message.Type.DISCOVER);
@@ -114,7 +101,7 @@ class Processor {
 
         LOGGER.debug("Discovery request from [" + request.getAddress() + "]:" + request.getPort());
 
-        return new ExchangePacket(request.getAddress(), port, response);
+        return new ExchangePacket(request, response);
     }
 
     private ExchangePacket processCONNECT(final ExchangePacket request) {
@@ -166,9 +153,9 @@ class Processor {
 
         LOGGER.debug("User " + player.getName() + " joined the server");
 
-        // TODO: REMOVE THIS UGLINESS
+        // TODO: REMOVE
         if (this.server.getOnlinePlayers() == 2) {
-            LOGGER.debug("Starting game");
+            LOGGER.debug("Game started");
             this.server.startRoomForStep1();
         }
 
@@ -197,6 +184,12 @@ class Processor {
         this.server.removePlayer(uuid);
 
         LOGGER.debug("User " + player.getName() + " left the server");
+
+        // TODO: REMOVE
+        if (this.server.getOnlinePlayers() < 2) {
+            this.server.endRoomForStep1();
+            LOGGER.debug("Game ended");
+        }
 
         return new ExchangePacket(request, new Message(Message.Type.OK));
     }
@@ -230,7 +223,11 @@ class Processor {
         if (room == null) {
             return new ExchangePacket(request, this.error("game not started"));
         }
-        room.doCommand(player, command);
+        try {
+            room.doCommand(player, command);
+        } catch (RuntimeException e) {
+            return new ExchangePacket(request, this.error(e.getMessage()));
+        }
 
         return new ExchangePacket(request, new Message(Message.Type.OK));
     }
