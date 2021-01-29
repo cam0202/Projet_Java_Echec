@@ -114,7 +114,7 @@ public class GameTest {
 	
 	@Test 
 	public void testCreateMove() {
-		Move m = this.g.createMove("a", 4, "b", 5);
+		Move m = this.g.createMove('a', 4, 'b', 5);
 		assertEquals(m.getStart().getColumn(), 0);
 		assertEquals(m.getStart().getRow(), 3);
 		assertEquals(m.getEnd().getColumn(), 1);
