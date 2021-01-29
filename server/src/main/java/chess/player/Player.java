@@ -11,16 +11,16 @@ public class Player {
         this.name = this.uuid.toString();
     }
 
+    public void setName(final String name) {
+        this.name = name;
+    }
+
     public UUID getUUID() {
         return this.uuid;
     }
 
     public String getName() {
         return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 }

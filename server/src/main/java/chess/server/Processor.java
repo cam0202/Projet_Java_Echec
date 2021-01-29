@@ -75,6 +75,9 @@ class Processor {
             case Message.Type.DISCONNECT:
                 return processDISCONNECT(request);
 
+            case Message.Type.MOVE:
+                return processMOVE(request);
+
             default: {
                 return new ExchangePacket(request, this.error("unknown message type"));
             }
@@ -82,20 +85,8 @@ class Processor {
     }
 
     private ExchangePacket processDISCOVER(final ExchangePacket request) {
-        if (request.getMessage().getData().length() <= 0) {
-            // Request does not provide a response port, and we know the player
-            // won't listen on the port we know, so just ignore it
-            return null;
-        }
-
-        int port = -1;
-
-        try {
-            JSONObject root = new JSONObject(request.getMessage().getData());
-            port = root.getInt("port");
-        } catch (JSONException e) {
-            // Again, we could not decode the response port, so we can't respond
-            return null;
+        if (request.getMessage().getData().length() > 0) {
+            return new ExchangePacket(request, this.error("payload must be empty"));
         }
 
         Message response = new Message(Message.Type.DISCOVER);
@@ -110,7 +101,7 @@ class Processor {
 
         LOGGER.debug("Discovery request from [" + request.getAddress() + "]:" + request.getPort());
 
-        return new ExchangePacket(request.getAddress(), port, response);
+        return new ExchangePacket(request, response);
     }
 
     private ExchangePacket processCONNECT(final ExchangePacket request) {
@@ -155,11 +146,18 @@ class Processor {
             if (this.server.getOnlinePlayers() < this.server.getMaxOnlinePlayers()) {
                 this.server.addPlayer(uuid, player);
             } else {
+                LOGGER.debug("Cannot accept new player because server reached max player limit");
                 return new ExchangePacket(request, this.error("server is full"));
             }
         }
 
         LOGGER.debug("User " + player.getName() + " joined the server");
+
+        // TODO: REMOVE
+        if (this.server.getOnlinePlayers() == 2) {
+            LOGGER.debug("Game started");
+            this.server.startRoomForStep1();
+        }
 
         return new ExchangePacket(request, response);
     }
@@ -183,12 +181,54 @@ class Processor {
             return new ExchangePacket(request, this.error("not connected"));
         }
 
-        Message response = new Message(Message.Type.OK);
-
         this.server.removePlayer(uuid);
 
         LOGGER.debug("User " + player.getName() + " left the server");
 
-        return new ExchangePacket(request, response);
+        // TODO: REMOVE
+        if (this.server.getOnlinePlayers() < 2) {
+            this.server.endRoomForStep1();
+            LOGGER.debug("Game ended");
+        }
+
+        return new ExchangePacket(request, new Message(Message.Type.OK));
+    }
+
+    private ExchangePacket processMOVE(final ExchangePacket request) {
+        if (request.getMessage().getData().length() <= 0) {
+            return new ExchangePacket(request, this.error("payload is empty"));
+        }
+
+        UUID uuid = null;
+        String command = null;
+        try {
+            JSONObject root = new JSONObject(request.getMessage().getData());
+            uuid = this.decodeUUID(root);
+            command = root.getString("command");
+        } catch (JSONException e) {
+            return new ExchangePacket(request, this.error("failed to decode payload: " + e.getMessage()));
+        }
+
+        Player player = this.server.getPlayer(uuid);
+
+        if (player == null) {
+            return new ExchangePacket(request, this.error("not connected"));
+        }
+
+        // TODO HANDLE ROOMS
+
+        // TODO EXEC
+        // TODO: REMOVE
+        RoomForStep1 room = this.server.getRoomForStep1();
+        if (room == null) {
+            return new ExchangePacket(request, this.error("game not started"));
+        }
+        try {
+            room.doCommand(player, command);
+        } catch (RuntimeException e) {
+            return new ExchangePacket(request, this.error(e.getMessage()));
+        }
+
+        return new ExchangePacket(request, new Message(Message.Type.OK));
     }
 }

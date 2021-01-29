@@ -5,20 +5,15 @@ import java.nio.charset.StandardCharsets;
 
 public class Message {
     public static class Type {
-        public static final int DISCOVER = 1;
+        public static final int DISCOVER = 100;
+        
+        public static final int OK = 200;
 
-        public static final int CONNECT = 10; // Channel CONTROL: authentication request sent by clients
-        public static final int DISCONNECT = 11; // Channel CONTROL: sent by either parties before closing the control
-                                                 // channel
+        public static final int CONNECT = 300;
+        public static final int DISCONNECT = 301;
+        public static final int MOVE = 302;
 
-        public static final int GET = 20; // Channel DATA: sent by clients to request a piece of data
-        public static final int POST = 21; // Channel DATA: sent by clients to trigger an action on the server
-        public static final int NOTIFY = 21; // Channel DATA: sent by the server to update the state of a client
-
-        public static final int OK = 30; // Channel CONTROL/DATA: generic success response
-        public static final int KO = 31; // Channel CONTROL/DATA: generic failure response
-        public static final int KEEPALIVE = 32; // Channel CONTROL/DATA: periodically sent by clients to maintain the
-                                                // connection in NATed environments
+        public static final int KO = 400;
     }
 
     public static final int HEADER_SIZE = Integer.BYTES + Integer.BYTES;

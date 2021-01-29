@@ -13,12 +13,12 @@ where:
 
 The default port for the server is UDP port `12345`.
 
-## Connection-less messages
+## Status messages
 - `OK(200)`: Generic success response. This is always sent by the server and will contain any data appropriate
 
-- `DISCOVER(110)`: Usually sent to the broadcast address (on the default port). Allows discovery of servers on the local network.
-    - A client's payload will contain the following mandatory fields:
-        - `port`: an integer representing the port the server should use to respond
+## Connection-less messages
+- `DISCOVER(100)`: Usually sent to the broadcast address (on the default port). Allows discovery of servers on the local network.
+    - A client's payload will be empty.
     - A server's payload will contain the following mandatory fields:
         - `uuid`: a unique identifier for this server (to help resolve duplicates)
         - `name`: a string representing the server's name
@@ -27,15 +27,21 @@ The default port for the server is UDP port `12345`.
         - `max_online_players`: an integer representing the maximum amount of players the server can handle
 
 ## Connection-full messages
-- `CONNECT(100)`: Request connection to a server.
+- `CONNECT(300)`: Request connection to a server.
     - A client's payload can contain the following optional fields:
         - `uuid`: a string representing a unique identifier. This is used to uniquely identify a player and manage the session (reconnect when connection dropped etc.).
         - `name`: a string representing the client's display name
     - A server's payload will contain the following mandatory fields:
         - `uuid`: a string representing a unique identifier. This must be present in the payload of every client request once the connection is established. If the client provided their own UUID, the client is trying to reestablished a lost connection. The server must try to reconnect the user, and will respond with the provided UUID on success, another UUID on failure.
         
-- `DISCONNECT(101)`: Request disconnect from a server.
+- `DISCONNECT(301)`: Request disconnect from a server.
     - A client's payload will contain the following mandatory fields:
         - `uuid`: a string representing the client's unique identifier
     - A server's payload will be empty.
+
+- `MOVE(302)`: Request to move a board piece from one location to another
+    - A client's payload will contain the following mandatory fields:
+        - `uuid`: a string representing the client's uuid
+        - `command`: a string containing the move command to execute on the server
+    - A server's payload will be empty
 

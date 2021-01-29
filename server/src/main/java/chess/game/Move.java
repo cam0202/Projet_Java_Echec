@@ -32,7 +32,7 @@ public class Move {
 	 * @param start
 	 * @param end
 	 */
-	Move(Location start, Location end){
+	public Move(Location start, Location end){
 		this.e = end;
 		this.s = start;
 		this.moveX = end.getColumn() - start.getColumn();

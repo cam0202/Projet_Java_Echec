@@ -14,9 +14,11 @@ public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
     private final HashMap<UUID, Player> players = new HashMap<>();
-    
+
     private final int port;
     private final UUID uuid;
+
+    private RoomForStep1 room = null; // TODO REMOVE
 
     public Server(final int port) {
         this.port = port;
@@ -47,16 +49,47 @@ public class Server {
         this.players.remove(uuid);
     }
 
+    // TODO: REMOVE
+    public void startRoomForStep1() {
+        Player p1 = null;
+        Player p2 = null;
+        int i = 0;
+        for (Player p : this.players.values()) { // Get first two players
+            if (i == 0)
+                p1 = p;
+            else if (i == 1)
+                p2 = p;
+            else
+                break;
+            i++;
+        }
+        this.room = new RoomForStep1(p1, p2);
+    }
+
+    // TODO: remove
+    public void endRoomForStep1() {
+        this.room = null;
+    }
+
+    // TODO: REMOVE
+    public RoomForStep1 getRoomForStep1() {
+        return this.room;
+    }
+
     public UUID getUUID() {
         return this.uuid;
     }
 
+    public int getPort() {
+        return this.port;
+    }
+
     public String getName() {
-        return "The Chess Server"; // TODO
+        return "The Main Server"; // TODO
     }
 
     public String getDescription() {
-        return "Where everything is happening"; // TODO
+        return "The is the main chess server"; // TODO
     }
 
     public int getOnlinePlayers() {
@@ -77,7 +110,8 @@ public class Server {
 
         try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
             // Set timeouts because accept() and receive() are blocking and
-            // non-interruptible, but we want to be able to cleanly exit on SIGINT
+            // non-interruptible, but we want to be able to cleanly exit on SIGINT so we
+            // need a little bit of polling
             socketTCP.setSoTimeout(200);
             socketUDP.setSoTimeout(200);
 
