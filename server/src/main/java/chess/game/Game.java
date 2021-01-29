@@ -100,10 +100,10 @@ public class Game {
 	 */
 	boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger
-		Chessman startChessman = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
+		Chessman startChessman = this.getSquare(move.getStart().getColumn(), move.getStart().getRow()).getChessman();
 		// première condition la case doit être libre et que le movement ne soit pas
 		// null
-		if (this.chess[move.getEnd().getColumn()][move.getEnd().getRow()].isTaken() == false && move.isNul() == false) {
+		if (this.getSquare(move.getEnd().getColumn(), move.getEnd().getRow()).isTaken() == false && move.isNul() == false) {
 
 			// on commence le traitement
 			if (!(startChessman instanceof Knight)) {
@@ -153,11 +153,11 @@ public class Game {
 	 * @param move
 	 */
 	public String move(Player p, Move move) throws RuntimeException {
+		Chessman c = this.getSquare(move.getStart().getColumn(), move.getStart().getRow()).getChessman();
+		
 		if (!this.moveOk(move)) {
 			throw new RuntimeException("Move not ok !");
 		}
-
-		Chessman c = this.chess[move.getStart().getColumn()][move.getStart().getRow()].getChessman();
 
 		if (!p.getName().equals(c.getPlayer().getName())) {
 			throw new RuntimeException("The pawn isn't yours !");

@@ -99,19 +99,6 @@ public class GameTest {
 		assertEquals(this.g.moveOk(m1), true);
 		
 	}
-	
-	@Test
-	public void testMove() {
-		// Pawn
-		Move m1 = new Move(new Location(3,1), new Location(3,3));
-		assertEquals(this.g.getSquare(3,1).isTaken(),true);
-		assertEquals(this.g.getSquare(3,3).isTaken(),false);
-		
-		System.out.println(this.g.move(this.c1,m1));
-		assertEquals(this.g.getSquare(3,1).isTaken(),false);
-		assertEquals(this.g.getSquare(3,3).isTaken(),true);
-	}
-	
 	@Test 
 	public void testCreateMove() {
 		Move m = this.g.createMove('a', 4, 'b', 5);
@@ -120,6 +107,31 @@ public class GameTest {
 		assertEquals(m.getEnd().getColumn(), 1);
 		assertEquals(m.getEnd().getRow(), 4);
 	}
+	
+	@Test
+	public void testMove() {
+		
+		Move m = this.g.createMove('c', 2, 'c', 3);
+		assertEquals(this.g.getSquare(m.getStart().getColumn(), m.getStart().getRow()).isTaken(),true);
+		assertEquals(this.g.getSquare(m.getEnd().getColumn(), m.getEnd().getRow()).isTaken(),false);
+		assertEquals(this.g.getSquare(m.getStart().getColumn(), m.getStart().getRow()).getChessman().getPlayer(),c1);
+		assertEquals(this.g.moveOk(m), true);
+		System.out.println(this.g.move(c1, m));
+		
+		/*
+		assertEquals(this.g.getSquare(1,4).isTaken(),false);
+		
+		// Pawn
+		Move m1 = new Move(new Location(3,1), new Location(3,3));
+		assertEquals(this.g.getSquare(3,1).isTaken(),true);
+		assertEquals(this.g.getSquare(3,3).isTaken(),false);
+		
+		System.out.println(this.g.move(this.c1,m1));
+		assertEquals(this.g.getSquare(3,1).isTaken(),false);
+		assertEquals(this.g.getSquare(3,3).isTaken(),true);
+		*/
+	}
+	
 
 	
 	
