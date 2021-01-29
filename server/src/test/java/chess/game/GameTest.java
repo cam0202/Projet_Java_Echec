@@ -15,8 +15,6 @@ public class GameTest {
 	Player c2;
 
 
-	
-	@SuppressWarnings("static-access")
 	@Before
 	public void setUp() throws Exception {
 		this.c1 = new Player(UUID.randomUUID());
@@ -30,16 +28,6 @@ public class GameTest {
 	public void testIni() {
 		for(int row = 0; row <= 7; row++){
 			for(int column = 0; column <= 7 ; column++) {
-				assertEquals(this.g.getSquare(column,row).isTaken(),false);
-			}
-		}
-	}
-	
-	@Test 
-	public void testStart() {
-		this.g.startGame();
-		for(int row = 0; row <= 7; row++){
-			for(int column = 0; column <= 7 ; column++) {
 				if(row <= 1) {
 					assertEquals(this.g.getSquare(column,row).isTaken(),true);
 				} else if(row >= 6) {
@@ -48,12 +36,14 @@ public class GameTest {
 					assertEquals(this.g.getSquare(column,row).isTaken(),false);
 				}
 			}
-		}	
+		}
+		
 	}
+	
+	
 	
 	@Test 
 	public void testClearSquare() {
-		this.g.startGame();
 		assertEquals(this.g.getSquare(7,1).isTaken(),true);
 		this.g.cleanSquare(7, 1);
 		assertEquals(this.g.getSquare(7,1).isTaken(),false);
@@ -71,7 +61,6 @@ public class GameTest {
 	
 	@Test 
 	public void testMoveOk() {
-		this.g.startGame();
 		
 		
 		// Pawn
@@ -113,7 +102,6 @@ public class GameTest {
 	
 	@Test
 	public void testMove() {
-		this.g.startGame();
 		// Pawn
 		Move m1 = new Move(new Location(3,1), new Location(3,3));
 		assertEquals(this.g.getSquare(3,1).isTaken(),true);
@@ -123,6 +111,17 @@ public class GameTest {
 		assertEquals(this.g.getSquare(3,1).isTaken(),false);
 		assertEquals(this.g.getSquare(3,3).isTaken(),true);
 	}
+	
+	@Test 
+	public void testCreateMove() {
+		Move m = this.g.createMove("a", 4, "b", 5);
+		assertEquals(m.getStart().getColumn(), 0);
+		assertEquals(m.getStart().getRow(), 3);
+		assertEquals(m.getEnd().getColumn(), 1);
+		assertEquals(m.getEnd().getRow(), 4);
+	}
+
+	
 	
 	
 

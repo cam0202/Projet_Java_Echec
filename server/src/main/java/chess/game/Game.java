@@ -36,41 +36,9 @@ public class Game {
 		this.players = new Player[2];
 		this.players[0] = p1;
 		this.players[1] = p2;
-	}
-	
-	/**
-	 * getSquare, permet de récupérer une case choisi dans le jeu
-	 * @param column, x
-	 * @param row, y
-	 * @return la case de la position choisi
-	 */
-	Square getSquare(int column, int row) {
-		return this.chess[column][row];
-	}
-	
-	/**
-	 * clenSquare, vide la case chosi
-	 * @param column, x
-	 * @param row, y
-	 */
-	void cleanSquare(int column, int row) {
-		this.chess[column][row].setChessman(null);
-	}
-	
-	/**
-	 * setSquare, MAJ la case chosi
-	 * @param column, x
-	 * @param row, y
-	 */
-	void setSquare(int column, int row, Chessman c) {
-		this.chess[row][column].setChessman(c);
-	}
-	
-	/**
-	 * startGame, initialise le plateau de jeu
-	 */
-	void startGame(){
-		// player 1
+		
+		// init chessman
+		
 		int row = 7;
 		
 		(this.chess[0][row]).setChessman(new Rook(this.players[1], 1)); 
@@ -101,6 +69,34 @@ public class Game {
 			(this.chess[column][row+1]).setChessman(new Pawn(this.players[0], 0)); 
 		}
 		
+	}
+	
+	/**
+	 * getSquare, permet de récupérer une case choisi dans le jeu
+	 * @param column, x
+	 * @param row, y
+	 * @return la case de la position choisi
+	 */
+	Square getSquare(int column, int row) {
+		return this.chess[column][row];
+	}
+	
+	/**
+	 * clenSquare, vide la case chosi
+	 * @param column, x
+	 * @param row, y
+	 */
+	void cleanSquare(int column, int row) {
+		this.chess[column][row].setChessman(null);
+	}
+	
+	/**
+	 * setSquare, MAJ la case chosi
+	 * @param column, x
+	 * @param row, y
+	 */
+	void setSquare(int column, int row, Chessman c) {
+		this.chess[row][column].setChessman(c);
 	}
 	
 	/**
@@ -237,6 +233,7 @@ public class Game {
 		return new Move(start, end);
 		
 	}
+
 	
 	
 }
