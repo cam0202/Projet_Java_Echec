@@ -1,5 +1,7 @@
 package chess.server;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 
 import chess.game.Game;
@@ -25,11 +27,11 @@ public class RoomForStep1 {
             throw new RuntimeException("invalid command");
         }
 
-        char[] data = command.toUpperCase().toCharArray();
-        Move move = this.board.createMove(data[0], Integer.valueOf(data[1]), data[2], Integer.valueOf(data[3]));
+        char[] data = command.toLowerCase().toCharArray();
+        LOGGER.debug("MOVE command " + Arrays.toString(data));
+        Move move = this.board.createMove(data[0], Character.getNumericValue(data[1]), data[2], Character.getNumericValue(data[3]));
 
         this.board.move(player, move);
-        LOGGER.debug("MOVE command " + command);
 
         /*
          * Move move = this.board.getMove(command);
