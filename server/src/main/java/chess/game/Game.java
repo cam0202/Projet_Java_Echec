@@ -158,6 +158,10 @@ public class Game {
 		if (!this.moveOk(move)) {
 			throw new RuntimeException("Move not ok !");
 		}
+		
+		if (c == null) {
+			throw new RuntimeException("Not have chessman in this square !");
+		}
 
 		if (!p.getName().equals(c.getPlayer().getName())) {
 			throw new RuntimeException("The pawn isn't yours !");
