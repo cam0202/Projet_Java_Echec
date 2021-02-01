@@ -1,7 +1,6 @@
 package chess.game.cli;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -36,6 +35,7 @@ public class GameCLI extends Game {
     public void loop() {
         // All of this is temporary, and is just to make a somewhat functional 0.1.0
         // version
+        System.out.println("Welcome!");
         try (Scanner scanner = new Scanner(System.in)) {
             Server server = null;
 
