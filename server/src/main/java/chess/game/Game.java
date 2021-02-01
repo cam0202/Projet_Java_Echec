@@ -40,7 +40,6 @@ public class Game {
 		
 		// init pieces
 		int row = 7;
-
 		(this.chess[0][row]).setChessman(new Rook(this.players[1], 1));
 		(this.chess[1][row]).setChessman(new Knight(this.players[1], 1));
 		(this.chess[2][row]).setChessman(new Bishop(this.players[1], 1));
@@ -101,15 +100,18 @@ public class Game {
 	boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger
 		Chessman startChessman = this.getSquare(move.getStart().getColumn(), move.getStart().getRow()).getChessman();
+		System.out.println("depart : " +move.getStart().getColumn()+" "+ move.getStart().getRow() );
+		System.out.println("arrivée : " +move.getEnd().getColumn()+" "+ move.getEnd().getRow() );
 		// première condition la case doit être libre et que le movement ne soit pas
 		// null
 		if (this.getSquare(move.getEnd().getColumn(), move.getEnd().getRow()).isTaken() == false && move.isNul() == false) {
-
+			System.out.println(startChessman.getName());
 			// on commence le traitement
 			if (!(startChessman instanceof Knight)) {
 
 				if (!(startChessman instanceof Pawn)) {
-
+					
+					System.out.println("cc");
 					// vérification que le déplacement est supérieur à un
 					if (!(Math.abs(move.getLocationX()) - Math.abs(move.getLocationY()) <= 1
 							&& Math.abs(move.getLocationX()) + Math.abs(move.getLocationY()) <= 1)) {
@@ -135,7 +137,7 @@ public class Game {
 
 				} else {
 					// cas pion
-					return !this.getSquare(move.getEnd().getRow(), move.getEnd().getColumn()).isTaken();
+					return !this.getSquare(move.getEnd().getColumn(), move.getEnd().getRow()).isTaken();
 				}
 
 			} else {
