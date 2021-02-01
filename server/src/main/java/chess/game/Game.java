@@ -100,12 +100,10 @@ public class Game {
 	boolean moveOk(Move move) {
 		// récupération de la pièce qu'on veut bouger
 		Chessman startChessman = this.getSquare(move.getStart().getColumn(), move.getStart().getRow()).getChessman();
-		System.out.println("depart : " +move.getStart().getColumn()+" "+ move.getStart().getRow() );
-		System.out.println("arrivée : " +move.getEnd().getColumn()+" "+ move.getEnd().getRow() );
+		
 		// première condition la case doit être libre et que le movement ne soit pas
 		// null
 		if (this.getSquare(move.getEnd().getColumn(), move.getEnd().getRow()).isTaken() == false && move.isNul() == false) {
-			System.out.println(startChessman.getName());
 			// on commence le traitement
 			if (!(startChessman instanceof Knight)) {
 
