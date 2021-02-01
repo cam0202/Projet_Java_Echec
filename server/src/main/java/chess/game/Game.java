@@ -206,11 +206,11 @@ public class Game {
 	}
 
 	Location createLocation(char posX, int posY) {
-		if (posX < 'a' || posX > 'g') {
+		if (posX < 'a' || posX > 'h') {
 			throw new IllegalArgumentException("invalid character " + posX);
 		}
 
-		if (posY < 1 || posY > 6) {
+		if (posY < 1 || posY > 7) {
 			throw new IllegalArgumentException("invalid integer " + posY);
 		}
 
