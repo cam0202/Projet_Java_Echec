@@ -197,6 +197,9 @@ public class Game {
 			case 6:
 				posX = "g";
 				break;
+			case 7:
+				posX = "h";
+				break;
 		}
 		return "Player " + c.getName() + " move in (" + posX + "," + ((int) move.getEnd().getRow() + 1) + ")";
 
@@ -233,6 +236,9 @@ public class Game {
 				break;
 			case 'g':
 				x = 6;
+				break;
+			case 'h':
+				x = 7;
 				break;
 		}
 		return new Location(x, posY - 1);
