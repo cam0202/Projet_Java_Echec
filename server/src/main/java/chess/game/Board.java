@@ -130,13 +130,20 @@ public class Board {
     }
     
     
-    public String fight(Chessman of, String name) {
+    public String fight(Chessman of, String name) throws BoardException {
+    	if(this.fightPlayer == null) {
+    		throw new BoardException("Not have a fight !");
+    	}
     	String result = this.fight(of, name);
     	if(!result.contains("impact")) {
     		if(result.equals(this.white.getName())) {
     			this.score[0] += this.value[0];
+    			this.fightPlayer = null;
+    			return result + " win " + this.score[0] + " points";
     		} else {
     			this.score[1] += this.value[1];
+    			this.fightPlayer = null;
+    			return result + " win " + this.score[0] + " points";
     		}
     	}
     	return result;
