@@ -10,10 +10,10 @@ public class Fight {
     private Chessman c2;
     private Chessman whoIsNext;
 
-    public Fight(Chessman c1, Chessman c2){
+    public Fight(Chessman c1, Chessman c2, Chessman whoIsNext){
         this.c1 = c1;
         this.c2 = c2;
-        this.whoIsNext = c2;
+        this.whoIsNext = whoIsNext;
     }
 
     
@@ -24,6 +24,11 @@ public class Fight {
         }
         throw new BoardException("Attack does exist !");
     }
+    
+    public int[] possiblePoint() {
+    	int[] value = {this.c1.getLive(), this.c2.getLive()};
+    	return value;
+    }
 
     public String toFight(Chessman c, String name) throws BoardException {
         
@@ -32,11 +37,11 @@ public class Fight {
         }
 
         if (this.whoIsNext.getLive() <= 0){
-            return "You have win the fight";
+            return c.getPlayer().getName();
         }
 
         if (c.getLive() <= 0){
-            return "You loose the fight";
+            return this.whoIsNext.getPlayer().getName();
         }
 
         Attack attack = this.chooseAttacks(c, name);
