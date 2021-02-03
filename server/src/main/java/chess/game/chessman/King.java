@@ -5,8 +5,10 @@ import chess.player.Player;
 
 public class King extends Chessman {
 
+    private static Attack[] attacks = { new Attack("Strangle"), new Attack("Blast"), new Attack("Char") };
+
     public King(Player player) {
-        super("king", player);
+        super("king", player,100, attacks);
     }
 
     @Override

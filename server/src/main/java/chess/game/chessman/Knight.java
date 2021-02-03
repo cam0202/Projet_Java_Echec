@@ -5,8 +5,10 @@ import chess.player.Player;
 
 public class Knight extends Chessman {
 
+    private static Attack[] attacks = { new Attack("Torch"), new Attack("Dance"), new Attack("Bolt") };
+
     public Knight(Player player) {
-        super("knight", player);
+        super("knight", player, 30, attacks);
     }
 
     @Override
@@ -14,11 +16,6 @@ public class Knight extends Chessman {
         int row = Math.abs(move.getDirectionRow());
         int col = Math.abs(move.getDirectionCol());
         return ((row == 2 && col == 1) || (row == 1 && col == 2));
-
-        /*
-         * return (Math.abs(move.getDirectionRow() / move.getDirectionCol())) == 2 |
-         * (Math.abs(move.getDirectionRow() / move.getDirectionCol())) == .5;
-         */
     }
 
 }

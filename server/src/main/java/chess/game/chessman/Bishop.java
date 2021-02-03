@@ -5,8 +5,10 @@ import chess.player.Player;
 
 public class Bishop extends Chessman {
 
+    private static Attack[] attacks = { new Attack("Baffle"), new Attack("Crush"), new Attack("Bloom") };
+
     public Bishop(Player player) {
-        super("bishop", player);
+        super("bishop", player,30,attacks);
     }
 
     @Override
