@@ -7,16 +7,20 @@ public class Board {
 
     private final Player white;
     private final Player black;
+    private int[] score;
+    private int[] value;
 
     private Player whoIsNext;
 
     private Square[][] board;
+    private Fight fightPlayer;
 
     public Board(final Player white, Player black) {
         this.white = white;
         this.black = black;
+        this.score = new int[2];
 
-        this.whoIsNext = white;
+        this.whoIsNext = black;
 
         this.board = new Square[8][8];
 
@@ -64,7 +68,12 @@ public class Board {
     }
 
     public String move(Player player, Move move) throws BoardException {
-        if (!this.whoIsNext.equals(player)) {
+        
+    	if(this.fightPlayer != null) {
+    		throw new BoardException("Sorry you can't move, have fight in the game.");
+    	}
+    	
+    	if (!this.whoIsNext.equals(player)) {
             throw new BoardException("it's not your turn");
         }
 
@@ -88,8 +97,13 @@ public class Board {
 
         Chessman inTheWay = this.inTheWay(chessman, move);
         if (inTheWay != null) {
-            // TODO COMBATS
-            throw new BoardException(chessman.getName() + " is blocked by " + inTheWay.getName());
+        	if(inTheWay.getPlayer().equals(this.white)) {
+        		this.fightPlayer = new Fight(inTheWay, chessman, inTheWay);
+        	}else {
+        		 this.fightPlayer = new Fight(chessman, inTheWay, chessman);
+        	}
+            this.value = this.fightPlayer.possiblePoint();
+            return " Go to fight";
         }
 
         this.board[move.getEnd().getRow()][move.getEnd().getCol()].setChessman(chessman);
@@ -113,6 +127,19 @@ public class Board {
         }
 
         return this.board[move.getEnd().getRow()][move.getEnd().getCol()].getChessman();
+    }
+    
+    
+    public String fight(Chessman of, String name) {
+    	String result = this.fight(of, name);
+    	if(!result.contains("impact")) {
+    		if(result.equals(this.white.getName())) {
+    			this.score[0] += this.value[0];
+    		} else {
+    			this.score[1] += this.value[1];
+    		}
+    	}
+    	return result;
     }
 
 }
