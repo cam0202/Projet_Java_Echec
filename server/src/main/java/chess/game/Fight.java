@@ -25,6 +25,12 @@ public class Fight {
         throw new BoardException("Attack does exist !");
     }
     
+    public String possibleAttack(Chessman c) {
+    	return c.getName() + "can attack with " + c.getAttacks()[0].getName() 
+    			+", " + c.getAttacks()[1].getName()
+    			+", " + c.getAttacks()[2].getName()+".";
+    }
+    
     public int[] possiblePoint() {
     	int[] value = {this.c1.getLive(), this.c2.getLive()};
     	return value;

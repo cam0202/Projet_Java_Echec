@@ -103,14 +103,14 @@ public class Board {
         		 this.fightPlayer = new Fight(chessman, inTheWay, chessman);
         	}
             this.value = this.fightPlayer.possiblePoint();
-            return " Go to fight";
+            return " Go to fight. " + this.fightPlayer.possibleAttack(chessman) + " " + this.fightPlayer.possibleAttack(inTheWay);
         }
 
         this.board[move.getEnd().getRow()][move.getEnd().getCol()].setChessman(chessman);
         this.board[move.getStart().getRow()][move.getStart().getCol()].clear();
         this.whoIsNext = this.whoIsNext.equals(this.white) ? this.black : this.white;
 
-        return "moved " + chessman.getName() + " to " + move.getEnd().toString();
+        return chessman.getPlayer().getName() + " moved " + chessman.getName() + " to " + move.getEnd().toString();
     }
 
     private Chessman inTheWay(Chessman of, Move move) {
@@ -139,11 +139,11 @@ public class Board {
     		if(result.equals(this.white.getName())) {
     			this.score[0] += this.value[0];
     			this.fightPlayer = null;
-    			return result + " win " + this.score[0] + " points";
+    			return this.white.getName() + " win " + this.score[0] + " points and "+ this.black.getName() +" loose.";
     		} else {
     			this.score[1] += this.value[1];
     			this.fightPlayer = null;
-    			return result + " win " + this.score[0] + " points";
+    			return this.black.getName() + " win " + this.score[1] + " points and "+ this.white.getName() +" loose.";
     		}
     	}
     	return result;
