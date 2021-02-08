@@ -2,6 +2,9 @@ package chess.game.cli;
 
 import java.io.IOException;
 
+import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
@@ -12,15 +15,48 @@ import chess.game.Game;
 public class GameCLI extends Game {
     private static final Logger LOGGER = Logger.getLogger(GameCLI.class);
 
-    private DefaultTerminalFactory factory;
+    private final DefaultTerminalFactory factory;
+
+    private GameCLIScreen nextGUI;
 
     public GameCLI() throws IOException {
         this.factory = new DefaultTerminalFactory();
         this.factory.setPreferTerminalEmulator(false);
+
+        this.nextGUI = null;
+    }
+
+    public void setNextGUI(final GameCLIScreen gui) {
+        this.nextGUI = gui;
     }
 
     @Override
     public void loop() {
+        try (Terminal terminal = this.factory.createTerminal()) {
+            terminal.setCursorVisible(false);
+
+            try (Screen screen = new TerminalScreen(terminal)) {
+                screen.startScreen();
+
+                MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
+
+                this.nextGUI = new GameCLIScreenHome(this);
+
+                while (this.nextGUI != null) {
+                    final GameCLIScreen next = this.nextGUI;
+                    this.nextGUI = null;
+                    gui.addWindow(next);
+                    next.waitUntilClosed();
+                }
+
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
+            }
+
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+        }
+
         /*
          * // All of this is temporary, and is just to make a somewhat functional 0.1.0
          * // version try (Scanner scanner = new Scanner(System.in)) { Server server =
@@ -72,6 +108,24 @@ public class GameCLI extends Game {
         // @formatter:off
         /*
         *
+        *                       
+        *            CHESS           │        AVAILABLE SERVERS                        
+        *                            │                     
+        *  > Join a server           │  [The Main Server] 2/10                              
+        *  > Settings                │   This is the main server                              
+        *                            │                                 
+        *                            │  [Another server] 19/20                              
+        *                            │   Come play with us, we have                               
+        *                            │   cookies!                              
+        *                            │                                 
+        *                            │      .....searching.....                      
+        *                            │                                 
+        */
+        // @formatter:on
+
+        // @formatter:off
+        /*
+        *
         *        CHESS          ┌────────────────────────────────┐ 
         *  Server: Server name  │                                │
         *    Room: #1           │                                │
@@ -93,9 +147,7 @@ public class GameCLI extends Game {
         // @formatter:on
 
         /*
-         * ████
-         * ████
-         * try { //this.currentScreen.things();
+         * ████ ████ try { //this.currentScreen.things();
          * 
          * terminal.enterPrivateMode(); terminal.setCursorVisible(false);
          * terminal.setBackgroundColor(TextColor.ANSI.BLUE);
@@ -114,16 +166,5 @@ public class GameCLI extends Game {
          * 
          * }
          */
-
-        try (Terminal terminal = this.factory.createTerminal()) {
-            terminal.setCursorVisible(false);
-
-            GameCLIScreen screen = new GameCLIScreenHome(terminal, null);
-
-            screen.render();
-
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-        }
     }
 }

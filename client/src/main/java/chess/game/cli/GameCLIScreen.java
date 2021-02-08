@@ -1,28 +1,38 @@
 package chess.game.cli;
 
-import java.io.IOException;
+import java.util.Arrays;
 
-import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.screen.TabBehaviour;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.SimpleTheme;
+import com.googlecode.lanterna.gui2.BasicWindow;
+import com.googlecode.lanterna.gui2.Window;
 
-public abstract class GameCLIScreen {
-    protected final Terminal terminal;
-    protected final TerminalScreen screen;
-    
-    protected final GameCLIScreen previous;
+import org.apache.log4j.Logger;
 
-    protected GameCLIScreen(final Terminal terminal, final GameCLIScreen previous) throws IOException {
-        this.terminal = terminal;
-        this.screen = new TerminalScreen(this.terminal);
-        this.screen.setTabBehaviour(TabBehaviour.IGNORE);
-        this.screen.setCursorPosition(TerminalPosition.TOP_LEFT_CORNER);
-        
-        this.previous = previous;
+public abstract class GameCLIScreen extends BasicWindow {
+    private static final Logger LOGGER = Logger.getLogger(GameCLIScreen.class);
+
+    protected final GameCLI game;
+
+    protected GameCLIScreen(final GameCLI game) {
+        this.game = game;
+
+        this.setTitle(" Chess Game ");
+        this.setHints(Arrays.asList(
+            Window.Hint.FULL_SCREEN,
+            Window.Hint.NO_POST_RENDERING
+        ));
+        this.setTheme(SimpleTheme.makeTheme(
+            true, 
+            TextColor.ANSI.WHITE,
+            TextColor.ANSI.BLACK, 
+            TextColor.ANSI.RED, 
+            TextColor.ANSI.GREEN, 
+            TextColor.ANSI.BLUE, 
+            TextColor.ANSI.YELLOW, 
+            TextColor.ANSI.MAGENTA
+        ));
     }
-
-    public abstract void render() throws IOException;
 
     //public abstract String get();
     //public abstract List<CLIOption> getOptions();

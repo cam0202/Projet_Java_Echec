@@ -7,8 +7,10 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,7 +49,7 @@ public class Server {
         this.socketTCP = socketTCP;
     }
 
-    public static Collection<ExchangePacket> discover() throws IOException {
+    public static List<ExchangePacket> discover() throws IOException {
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(600);
 
@@ -88,7 +90,7 @@ public class Server {
                 }
             }
 
-            return servers.values();
+            return new ArrayList<>(servers.values());
         }
     }
 
