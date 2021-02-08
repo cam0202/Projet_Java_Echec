@@ -130,7 +130,7 @@ public class Board {
     }
     
     
-    public String fight(String name) throws BoardException {
+    private String fight(String name) throws BoardException {
     	if(this.fightPlayer == null) {
     		throw new BoardException("Not have a fight !");
     	}
@@ -147,6 +147,21 @@ public class Board {
     		}
     	}
     	return result;
+    }
+    
+    public String play(Player player, Move move, String nameAttack) throws BoardException{
+    	
+    	if(this.score[0] == 890 ) {
+    		return this.white.getName() + " have win the game !";
+    	}
+    	if(this.score[1] == 890 ) {
+    		return this.black.getName() + " have win the game !";
+    	}
+    	if(nameAttack != null) {
+    		return this.move(player, move);
+    	} else {
+    		return this.fight(nameAttack);
+    	}
     }
 
 }
