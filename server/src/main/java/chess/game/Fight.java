@@ -36,8 +36,8 @@ public class Fight {
     	return value;
     }
 
-    public String toFight(Chessman c, String name) throws BoardException {
-        
+    public String toFight(String name) throws BoardException {
+    	Chessman c= this.whoIsNext.equals(this.c1) ? this.c2 : this.c1;; 
         if(!this.whoIsNext.equals(c)){
             throw new BoardException("it's not your turn");
         }
