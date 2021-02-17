@@ -3,6 +3,10 @@ package chess.game;
 import chess.game.chessman.*;
 import chess.player.Player;
 
+/**
+ * Class Board Elle permet de réprésenter le jeux.
+ *
+ */
 public class Board {
 
     private final Player white;
@@ -16,12 +20,16 @@ public class Board {
     private Fight fightPlayer;
 
     public Board(final Player white, Player black) {
+    	// init joueur 
         this.white = white;
         this.black = black;
+        // init tableau de score
         this.score = new int[2];
-
+        
+        // init joueur suivant 
         this.whoIsNext = black;
-
+        
+        // init des 64 case de l'échequier
         this.board = new Square[8][8];
 
         for (int letter = 0; letter < this.board.length; letter++) {
@@ -58,17 +66,33 @@ public class Board {
             (this.board[letter][6]).setChessman(new Pawn(this.black, false));
         }
     }
-
+    
+    /**
+     * getWhite, joueur 1 
+     * @return Player
+     */
     public Player getWhite() {
         return this.white;
     }
-
+    
+    /**
+     * getBlack, joueur 2
+     * @return
+     */
     public Player getBlack() {
         return this.black;
     }
-
+    
+    /**
+     * move, movement sur le plateau 
+     * @param player
+     * @param move
+     * @return String 
+     * @throws BoardException
+     */
     public String move(Player player, Move move) throws BoardException {
         
+    	// exceptions
     	if(this.fightPlayer != null) {
     		throw new BoardException("Sorry you can't move, have fight in the game.");
     	}
@@ -94,7 +118,8 @@ public class Board {
         if (!chessman.canMove(move)) {
             throw new BoardException(chessman.getName() + " cannot move to " + move.getEnd());
         }
-
+        
+        //vérification du déplacement 
         Chessman inTheWay = this.inTheWay(chessman, move);
         if (inTheWay != null) {
         	if(inTheWay.getPlayer().equals(this.white)) {
@@ -105,14 +130,21 @@ public class Board {
             this.value = this.fightPlayer.possiblePoint();
             return " Go to fight. " + this.fightPlayer.possibleAttack(chessman) + " " + this.fightPlayer.possibleAttack(inTheWay);
         }
-
+        
+        // déplacement  
         this.board[move.getEnd().getRow()][move.getEnd().getCol()].setChessman(chessman);
         this.board[move.getStart().getRow()][move.getStart().getCol()].clear();
         this.whoIsNext = this.whoIsNext.equals(this.white) ? this.black : this.white;
 
         return chessman.getPlayer().getName() + " moved " + chessman.getName() + " to " + move.getEnd().toString();
     }
-
+    
+    /**
+     * inTheWay, permet de savoir si suite à un déplacement un pion est présent sur le movemment ou à l'arrivé
+     * @param of
+     * @param move
+     * @return Chessman
+     */
     private Chessman inTheWay(Chessman of, Move move) {
         if (!(of instanceof Knight || of instanceof King)) {
             int row = move.getDirectionRow() != 0 ? move.getDirectionRow() / Math.abs(move.getDirectionRow()) : 0;
@@ -129,7 +161,12 @@ public class Board {
         return this.board[move.getEnd().getRow()][move.getEnd().getCol()].getChessman();
     }
     
-    
+    /**
+     * fight, combat dans le jeu
+     * @param name
+     * @return String 
+     * @throws BoardException
+     */
     private String fight(String name) throws BoardException {
     	if(this.fightPlayer == null) {
     		throw new BoardException("Not have a fight !");
@@ -149,6 +186,14 @@ public class Board {
     	return result;
     }
     
+    /**
+     * play, fonction permettant de faire un mouvement ou un combat 
+     * @param player
+     * @param move
+     * @param nameAttack
+     * @return String 
+     * @throws BoardException
+     */
     public String play(Player player, Move move, String nameAttack) throws BoardException{
     	
     	if(this.score[0] == 890 ) {

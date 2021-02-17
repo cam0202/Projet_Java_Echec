@@ -13,6 +13,7 @@ public class Rook extends Chessman {
 
     @Override
     public boolean canMove(Move move) {
+    	// La tour ne peut que ce déplacer de façon verticale 
         return move.getDirectionRow() * move.getDirectionCol() == 0 && !move.isNull();
     }
 
