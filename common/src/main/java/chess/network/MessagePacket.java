@@ -9,21 +9,21 @@ import chess.protocol.Message;
  * This class wraps a message and a destination for compatibility between
  * TCP and UDP transmisson methods
  */
-public class ExchangePacket {
+public class MessagePacket {
 
     private final InetAddress address;
     private final int port;
     private final Message message;
 
-    public ExchangePacket(final ExchangePacket template, final Message message) {
+    public MessagePacket(final MessagePacket template, final Message message) {
         this(template.getAddress(), template.getPort(), message);
     }
 
-    public ExchangePacket(final Socket socket, final Message message) {
+    public MessagePacket(final Socket socket, final Message message) {
         this(socket.getInetAddress(), socket.getPort(), message);
     }
 
-    public ExchangePacket(final InetAddress address, final int port, final Message message) {
+    public MessagePacket(final InetAddress address, final int port, final Message message) {
         if (address == null) {
             throw new IllegalArgumentException("destination address is null");
         }

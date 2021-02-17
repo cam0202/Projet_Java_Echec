@@ -8,9 +8,12 @@ import java.net.Socket;
 
 import chess.protocol.Message;
 
-public class TCPExchange {
+/**
+ * Helper functions to realise a UDP message exchange
+ */
+public class MessageTCP {
 
-    public static void send(final Socket socketTCP, final ExchangePacket packet) throws IOException {
+    public static void send(final Socket socketTCP, final MessagePacket packet) throws IOException {
         validateSocket(socketTCP);
 
         if (packet == null) {
@@ -22,7 +25,7 @@ public class TCPExchange {
         out.flush();
     }
 
-    public static ExchangePacket receive(final Socket socketTCP) throws IOException {
+    public static MessagePacket receive(final Socket socketTCP) throws IOException {
         validateSocket(socketTCP);
 
         BufferedInputStream in = new BufferedInputStream(socketTCP.getInputStream());
@@ -30,7 +33,7 @@ public class TCPExchange {
         byte[] header = new byte[Message.HEADER_SIZE];
         fillBufferFromStream(in, header);
 
-        ExchangePacket p = new ExchangePacket(socketTCP, new Message(header));
+        MessagePacket p = new MessagePacket(socketTCP, new Message(header));
 
         byte[] payload = new byte[p.getMessage().getAmountOfMissingDataBytes()];
         if (payload.length > 0) {

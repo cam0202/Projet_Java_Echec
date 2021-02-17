@@ -1,4 +1,4 @@
-package chess.game.cli;
+package chess.cli;
 
 import java.util.Arrays;
 
@@ -9,14 +9,10 @@ import com.googlecode.lanterna.gui2.Window;
 
 import org.apache.log4j.Logger;
 
-public abstract class GameCLIScreen extends BasicWindow {
-    private static final Logger LOGGER = Logger.getLogger(GameCLIScreen.class);
+public class GameCLIWindow extends BasicWindow {
+    private static final Logger LOGGER = Logger.getLogger(GameCLIWindow.class);
 
-    protected final GameCLI game;
-
-    protected GameCLIScreen(final GameCLI game) {
-        this.game = game;
-
+    protected GameCLIWindow() {
         this.setTitle(" Chess Game ");
         this.setHints(Arrays.asList(
             Window.Hint.FULL_SCREEN,
@@ -33,6 +29,8 @@ public abstract class GameCLIScreen extends BasicWindow {
             TextColor.ANSI.MAGENTA
         ));
     }
+
+    //public abstract void prepare();
 
     //public abstract String get();
     //public abstract List<CLIOption> getOptions();

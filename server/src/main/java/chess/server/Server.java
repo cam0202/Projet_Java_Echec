@@ -10,6 +10,9 @@ import org.apache.log4j.Logger;
 
 import chess.player.Player;
 
+/**
+ * This class represents the server instance. It launches one TCP and one UDP listener
+ */
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
@@ -109,12 +112,6 @@ public class Server {
         ListenerUDP listenerUDP = null;
 
         try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
-            // Set timeouts because accept() and receive() are blocking and
-            // non-interruptible, but we want to be able to cleanly exit on SIGINT so we
-            // need a little bit of polling
-            socketTCP.setSoTimeout(200);
-            socketUDP.setSoTimeout(200);
-
             listenerTCP = new ListenerTCP(this, socketTCP);
             listenerTCP.start();
 

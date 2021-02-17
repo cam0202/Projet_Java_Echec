@@ -27,6 +27,10 @@ public class Main extends Thread {
         Runtime.getRuntime().addShutdownHook(hook);
 
         Main.app = new App();
+        Main.app.setDaemon(false);
         Main.app.start();
+
+        // The JVM will wait for the application thread to exit because it is not a
+        // daemon, but will still receive signals
     }
 }

@@ -18,6 +18,7 @@ class App extends Thread {
         Logger loggerRoot = Logger.getRootLogger();
         loggerRoot.setLevel(Level.ALL);
         
+        // TODO: log elsewhere, because console is used
         ConsoleAppender loggerConsole = new ConsoleAppender();
         loggerConsole.setName("console");
         loggerConsole.setLayout(new SimpleLayout());
@@ -25,10 +26,9 @@ class App extends Thread {
         loggerRoot.addAppender(loggerConsole);
         
         GameFactory factory = new GameFactory();
-        Game game;
-
+        
         try {
-            game = factory.createGame();
+            Game game = factory.createGame();
             game.loop();
         } catch (IOException e) {
             LOGGER.fatal("Failed to create game", e);

@@ -1,3 +1,7 @@
+## Project
+/old
+**.old
+
 ## Maven
 target/
 pom.xml.tag

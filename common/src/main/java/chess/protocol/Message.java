@@ -3,10 +3,13 @@ package chess.protocol;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Implements our protocol, and provide useful functions to abstract it away.
+ */
 public class Message {
     public static class Type {
         public static final int DISCOVER = 100;
-        
+
         public static final int OK = 200;
 
         public static final int CONNECT = 300;

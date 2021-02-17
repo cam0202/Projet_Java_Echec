@@ -7,9 +7,12 @@ import java.nio.ByteBuffer;
 
 import chess.protocol.Message;
 
-public class UDPExchange {
+/**
+ * Helper functions to realise a UDP message exchange
+ */
+public class MessageUDP {
 
-    public static void send(final DatagramSocket socketUDP, final ExchangePacket packet) throws IOException {
+    public static void send(final DatagramSocket socketUDP, final MessagePacket packet) throws IOException {
         validateSocket(socketUDP);
 
         if (packet == null) {
@@ -21,7 +24,7 @@ public class UDPExchange {
         socketUDP.send(p);
     }
 
-    public static ExchangePacket receive(final DatagramSocket socketUDP) throws IOException {
+    public static MessagePacket receive(final DatagramSocket socketUDP) throws IOException {
         validateSocket(socketUDP);
 
         ByteBuffer buffer = ByteBuffer.allocate(Message.MAX_LENGTH);
@@ -31,7 +34,7 @@ public class UDPExchange {
         byte[] header = new byte[Message.HEADER_SIZE];
         buffer.get(header);
 
-        ExchangePacket p = new ExchangePacket(packet.getAddress(), packet.getPort(), new Message(header));
+        MessagePacket p = new MessagePacket(packet.getAddress(), packet.getPort(), new Message(header));
 
         byte[] payload = new byte[p.getMessage().getAmountOfMissingDataBytes()];
         buffer.get(payload);

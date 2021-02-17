@@ -1,6 +1,7 @@
-package chess.game.cli;
+package chess.cli;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.screen.Screen;
@@ -11,23 +12,69 @@ import com.googlecode.lanterna.terminal.Terminal;
 import org.apache.log4j.Logger;
 
 import chess.game.Game;
+import chess.server.Server;
 
 public class GameCLI extends Game {
+    
     private static final Logger LOGGER = Logger.getLogger(GameCLI.class);
 
     private final DefaultTerminalFactory factory;
+    private final GameCLIWindow window;
 
-    private GameCLIScreen nextGUI;
+    private Server server;
 
     public GameCLI() throws IOException {
         this.factory = new DefaultTerminalFactory();
         this.factory.setPreferTerminalEmulator(false);
+        this.window = new GameCLIWindow();
 
-        this.nextGUI = null;
+        this.server = null;
     }
 
-    public void setNextGUI(final GameCLIScreen gui) {
-        this.nextGUI = gui;
+    public void switchPanel(final GameCLIPanel newPanel) {
+        if (newPanel != null) {
+            newPanel.update();
+        }
+        
+        this.window.setComponent(newPanel);
+    }
+
+    public GameCLIWindow getWindow() {
+        return this.window;
+    }
+
+    public Server getServer() {
+        return this.server;
+    }
+
+    public boolean joinServer(final InetAddress address, final int port) {
+        if (this.server != null) {
+            throw new IllegalStateException("already joined a server");
+        }
+
+        try {
+            this.server = new Server(address, port);
+            this.server.connect();
+            return true;
+        } catch (IOException e) {
+            this.server = null;
+            return false;
+        }
+    }
+
+    public boolean leaveServer() {
+        if (this.server == null) {
+            throw new IllegalStateException("already left server");
+        }
+
+        try {
+            this.server.disconnect();
+            this.server = null;
+            return true;
+        } catch (IOException e) {
+            this.server = null;
+            return false;
+        }
     }
 
     @Override
@@ -39,15 +86,16 @@ public class GameCLI extends Game {
                 screen.startScreen();
 
                 MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
+                gui.addWindow(this.window);
 
-                this.nextGUI = new GameCLIScreenHome(this);
+                GameCLIPanel panel = new GameCLIPanelHome(this);
+                panel.update();
+                
+                this.window.setCloseWindowWithEscape(true); // TODO: temporary
+                this.window.setComponent(panel);
 
-                while (this.nextGUI != null) {
-                    final GameCLIScreen next = this.nextGUI;
-                    this.nextGUI = null;
-                    gui.addWindow(next);
-                    next.waitUntilClosed();
-                }
+                // TODO: SIGINT seems to not be handled correctly here...
+                gui.waitForWindowToClose(this.window);
 
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());
@@ -167,4 +215,5 @@ public class GameCLI extends Game {
          * }
          */
     }
+
 }

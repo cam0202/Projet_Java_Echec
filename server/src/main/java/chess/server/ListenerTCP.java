@@ -9,16 +9,21 @@ import org.apache.log4j.Logger;
 
 /**
  * This subclass will create a worker thread per player. This is ok for a small
- * app like this one, but we should create a worker pool if we wanted to scale up.
+ * app like this one, but we should create a worker pool if we wanted to scale
+ * up.
  */
 final class ListenerTCP extends Listener {
     private final static Logger LOGGER = Logger.getLogger(ListenerTCP.class);
 
     private final ServerSocket socket;
 
-    public ListenerTCP(final Server server, final ServerSocket socket) {
+    public ListenerTCP(final Server server, final ServerSocket socket) throws IOException {
         super(server);
         this.socket = socket;
+
+        // Set timeout because accept() is blocking and non-interruptible, but we want
+        // to be able to cleanly exit on SIGINT so we need a little bit of polling
+        this.socket.setSoTimeout(200);
     }
 
     @Override
@@ -33,6 +38,7 @@ final class ListenerTCP extends Listener {
                 worker.start();
 
             } catch (SocketTimeoutException ignore) {
+                continue;
             } catch (IOException e) {
                 LOGGER.error("Failed to establish TCP connection", e);
             }

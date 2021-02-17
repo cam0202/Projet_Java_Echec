@@ -6,8 +6,8 @@ import java.net.SocketTimeoutException;
 
 import org.apache.log4j.Logger;
 
-import chess.network.ExchangePacket;
-import chess.network.UDPExchange;
+import chess.network.MessagePacket;
+import chess.network.MessageUDP;
 
 /**
  * UDP packets are rare and fast to process, so they will be handled
@@ -19,18 +19,22 @@ final class ListenerUDP extends Listener {
 
     private final DatagramSocket socket;
 
-    public ListenerUDP(final Server server, final DatagramSocket socket) {
+    public ListenerUDP(final Server server, final DatagramSocket socket) throws IOException {
         super(server);
         this.socket = socket;
+
+        // Set timeouts because receive() is blocking and non-interruptible, but we want
+        // to be able to cleanly exit on SIGINT so we need a little bit of polling
+        this.socket.setSoTimeout(200);
     }
 
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            ExchangePacket request = null;
+            MessagePacket request = null;
 
             try {
-                request = UDPExchange.receive(this.socket);
+                request = MessageUDP.receive(this.socket);
             } catch (SocketTimeoutException ignore) {
                 continue;
             } catch (IOException e) {
@@ -39,10 +43,10 @@ final class ListenerUDP extends Listener {
             }
 
             Processor processor = new Processor(this.server);
-            ExchangePacket response = processor.process(request);
+            MessagePacket response = processor.process(request);
 
             try {
-                UDPExchange.send(this.socket, response);
+                MessageUDP.send(this.socket, response);
             } catch (IOException e) {
                 LOGGER.error("Failed to send UDP packet", e);
             }

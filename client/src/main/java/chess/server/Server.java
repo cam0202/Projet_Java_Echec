@@ -8,7 +8,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +17,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import chess.network.ExchangePacket;
-import chess.network.TCPExchange;
-import chess.network.UDPExchange;
+import chess.network.MessagePacket;
+import chess.network.MessageTCP;
+import chess.network.MessageUDP;
 import chess.protocol.Message;
 
 /**
@@ -49,30 +48,42 @@ public class Server {
         this.socketTCP = socketTCP;
     }
 
-    public static List<ExchangePacket> discover() throws IOException {
+    public boolean isConnected() {
+        return this.connected;
+    }
+
+    public InetAddress getAddress() {
+        return this.socketTCP.getInetAddress();
+    }
+
+    public int getPort() {
+        return this.socketTCP.getPort();
+    }
+
+    public static List<MessagePacket> discover() throws IOException {
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(600);
 
-            Map<UUID, ExchangePacket> servers = new HashMap<>();
+            Map<UUID, MessagePacket> servers = new HashMap<>();
 
             Message request = new Message(Message.Type.DISCOVER);
 
             LOGGER.debug(String.format("Discovering servers... (timeout: %sms)", socket.getSoTimeout()));
-            UDPExchange.send(socket, new ExchangePacket(Inet4Address.getByName("255.255.255.255"),
+            MessageUDP.send(socket, new MessagePacket(Inet4Address.getByName("255.255.255.255"),
                     chess.protocol.Server.DEFAULT_PORT, request));
-            UDPExchange.send(socket,
-                    new ExchangePacket(Inet6Address.getByName("ff02::1"), chess.protocol.Server.DEFAULT_PORT, request));
+            MessageUDP.send(socket,
+                    new MessagePacket(Inet6Address.getByName("ff02::1"), chess.protocol.Server.DEFAULT_PORT, request));
 
             while (true) {
                 try {
-                    ExchangePacket packet = UDPExchange.receive(socket);
+                    MessagePacket packet = MessageUDP.receive(socket);
                     LOGGER.debug("Discovered server [" + packet.getAddress() + "]:" + packet.getPort());
                     try {
                         JSONObject root = new JSONObject(packet.getMessage().getData());
                         UUID uuid = UUID.fromString(root.getString("uuid"));
 
                         // Add it to the list if not a duplicate. Prefer IPv6
-                        ExchangePacket current = servers.get(uuid);
+                        MessagePacket current = servers.get(uuid);
                         if (current == null) {
                             servers.put(uuid, packet);
                         } else if (current.getAddress() instanceof Inet4Address
@@ -108,9 +119,9 @@ public class Server {
             throw new IOException("failed to create request");
         }
 
-        TCPExchange.send(this.socketTCP, new ExchangePacket(this.socketTCP, request));
+        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
 
-        Message response = TCPExchange.receive(this.socketTCP).getMessage();
+        Message response = MessageTCP.receive(this.socketTCP).getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException("failed to connect: " + response.getData());
         }
@@ -141,9 +152,9 @@ public class Server {
             throw new IOException("failed to create request");
         }
 
-        TCPExchange.send(this.socketTCP, new ExchangePacket(this.socketTCP, request));
+        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
 
-        Message response = TCPExchange.receive(this.socketTCP).getMessage();
+        Message response = MessageTCP.receive(this.socketTCP).getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException("failed to disconnect: " + response.getData());
         }
@@ -172,9 +183,9 @@ public class Server {
             throw new IOException("failed to create request");
         }
 
-        TCPExchange.send(this.socketTCP, new ExchangePacket(this.socketTCP, request));
+        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
 
-        Message response = TCPExchange.receive(this.socketTCP).getMessage();
+        Message response = MessageTCP.receive(this.socketTCP).getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException(response.getData());
         }

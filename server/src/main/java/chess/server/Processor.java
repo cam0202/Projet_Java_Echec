@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import chess.network.ExchangePacket;
+import chess.network.MessagePacket;
 import chess.player.Player;
 import chess.protocol.Message;
 
@@ -60,7 +60,7 @@ class Processor {
      * @param request The request packet
      * @return The appropriate response, or null if no response can be sent
      */
-    public ExchangePacket process(final ExchangePacket request) {
+    public MessagePacket process(final MessagePacket request) {
         if (request == null) {
             throw new IllegalArgumentException("request cannot be null");
         }
@@ -79,14 +79,17 @@ class Processor {
                 return processMOVE(request);
 
             default: {
-                return new ExchangePacket(request, this.error("unknown message type"));
+                return new MessagePacket(request, this.error("unknown message type"));
             }
         }
     }
 
-    private ExchangePacket processDISCOVER(final ExchangePacket request) {
+    /**
+     * Handler for DISCOVER request
+     */
+    private MessagePacket processDISCOVER(final MessagePacket request) {
         if (request.getMessage().getData().length() > 0) {
-            return new ExchangePacket(request, this.error("payload must be empty"));
+            return new MessagePacket(request, this.error("payload must be empty"));
         }
 
         Message response = new Message(Message.Type.DISCOVER);
@@ -101,12 +104,15 @@ class Processor {
 
         LOGGER.debug("Discovery request from [" + request.getAddress() + "]:" + request.getPort());
 
-        return new ExchangePacket(request, response);
+        return new MessagePacket(request, response);
     }
 
-    private ExchangePacket processCONNECT(final ExchangePacket request) {
+    /**
+     * Handler for CONNECT request
+     */
+    private MessagePacket processCONNECT(final MessagePacket request) {
         if (request.getMessage().getData().length() <= 0) {
-            return new ExchangePacket(request, this.error("payload is empty"));
+            return new MessagePacket(request, this.error("payload is empty"));
         }
 
         UUID uuid = null;
@@ -117,7 +123,7 @@ class Processor {
             uuid = this.decodeUUID(root);
             name = root.getString("name");
         } catch (JSONException e) {
-            return new ExchangePacket(request, this.error("failed to decode payload: " + e.getMessage()));
+            return new MessagePacket(request, this.error("failed to decode payload: " + e.getMessage()));
         }
 
         Player player;
@@ -132,7 +138,7 @@ class Processor {
             player = this.server.getPlayer(uuid);
             if (player == null) {
                 // The session for this player does not exists
-                return new ExchangePacket(request, this.error("uuid is unknown"));
+                return new MessagePacket(request, this.error("uuid is unknown"));
             }
             // The session exists. Following requests will be valid
         }
@@ -147,7 +153,7 @@ class Processor {
                 this.server.addPlayer(uuid, player);
             } else {
                 LOGGER.debug("Cannot accept new player because server reached max player limit");
-                return new ExchangePacket(request, this.error("server is full"));
+                return new MessagePacket(request, this.error("server is full"));
             }
         }
 
@@ -159,12 +165,16 @@ class Processor {
             this.server.startRoomForStep1();
         }
 
-        return new ExchangePacket(request, response);
+        return new MessagePacket(request, response);
     }
 
-    private ExchangePacket processDISCONNECT(final ExchangePacket request) {
+
+    /**
+     * Handler for DISCONNECT request
+     */
+    private MessagePacket processDISCONNECT(final MessagePacket request) {
         if (request.getMessage().getData().length() <= 0) {
-            return new ExchangePacket(request, this.error("payload is empty"));
+            return new MessagePacket(request, this.error("payload is empty"));
         }
 
         UUID uuid = null;
@@ -172,13 +182,13 @@ class Processor {
             JSONObject root = new JSONObject(request.getMessage().getData());
             uuid = this.decodeUUID(root);
         } catch (JSONException e) {
-            return new ExchangePacket(request, this.error("failed to decode payload: " + e.getMessage()));
+            return new MessagePacket(request, this.error("failed to decode payload: " + e.getMessage()));
         }
 
         Player player = this.server.getPlayer(uuid);
 
         if (player == null) {
-            return new ExchangePacket(request, this.error("not connected"));
+            return new MessagePacket(request, this.error("not connected"));
         }
 
         this.server.removePlayer(uuid);
@@ -191,12 +201,15 @@ class Processor {
             LOGGER.debug("Game ended");
         }
 
-        return new ExchangePacket(request, new Message(Message.Type.OK));
+        return new MessagePacket(request, new Message(Message.Type.OK));
     }
 
-    private ExchangePacket processMOVE(final ExchangePacket request) {
+    /**
+     * Handler for MOVE request
+     */
+    private MessagePacket processMOVE(final MessagePacket request) {
         if (request.getMessage().getData().length() <= 0) {
-            return new ExchangePacket(request, this.error("payload is empty"));
+            return new MessagePacket(request, this.error("payload is empty"));
         }
 
         UUID uuid = null;
@@ -206,13 +219,13 @@ class Processor {
             uuid = this.decodeUUID(root);
             command = root.getString("command");
         } catch (JSONException e) {
-            return new ExchangePacket(request, this.error("failed to decode payload: " + e.getMessage()));
+            return new MessagePacket(request, this.error("failed to decode payload: " + e.getMessage()));
         }
 
         Player player = this.server.getPlayer(uuid);
 
         if (player == null) {
-            return new ExchangePacket(request, this.error("not connected"));
+            return new MessagePacket(request, this.error("not connected"));
         }
 
         // TODO HANDLE ROOMS
@@ -221,14 +234,14 @@ class Processor {
         // TODO: REMOVE
         RoomForStep1 room = this.server.getRoomForStep1();
         if (room == null) {
-            return new ExchangePacket(request, this.error("game not started"));
+            return new MessagePacket(request, this.error("game not started"));
         }
         try {
             room.doCommand(player, command);
         } catch (RuntimeException e) {
-            return new ExchangePacket(request, this.error(e.getMessage()));
+            return new MessagePacket(request, this.error(e.getMessage()));
         }
 
-        return new ExchangePacket(request, new Message(Message.Type.OK));
+        return new MessagePacket(request, new Message(Message.Type.OK));
     }
 }

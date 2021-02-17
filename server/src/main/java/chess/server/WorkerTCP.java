@@ -5,8 +5,8 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
-import chess.network.ExchangePacket;
-import chess.network.TCPExchange;
+import chess.network.MessagePacket;
+import chess.network.MessageTCP;
 
 /**
  * This class handles requests from a unique client, until they disconnect
@@ -25,11 +25,11 @@ class WorkerTCP implements Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            ExchangePacket request = null;
+            MessagePacket request = null;
             try {
-                request = TCPExchange.receive(this.socket);
+                request = MessageTCP.receive(this.socket);
             } catch (IOException exit) {
-                // Failed to read -> player disconnected -> this worker should exit
+                // Failed to read -> lost connection to player -> this worker should exit
                 LOGGER.debug("TCP connection closed [" + this.socket.getInetAddress() + "]:" + this.socket.getPort());
                 break;
             }
@@ -37,10 +37,10 @@ class WorkerTCP implements Runnable {
             LOGGER.debug("Request from [" + request.getAddress().toString() + "]:" + request.getPort());
 
             Processor processor = new Processor(this.server);
-            ExchangePacket response = processor.process(request);
+            MessagePacket response = processor.process(request);
 
             try {
-                TCPExchange.send(this.socket, response);
+                MessageTCP.send(this.socket, response);
             } catch (IOException e) {
                 LOGGER.error("Failed to send TCP packet", e);
             }

@@ -2,6 +2,10 @@ package chess.player;
 
 import java.util.UUID;
 
+/**
+ * Represents a player, so they can be disassociated from they transport layer
+ * session
+ */
 public class Player {
     private final UUID uuid;
     private String name;
