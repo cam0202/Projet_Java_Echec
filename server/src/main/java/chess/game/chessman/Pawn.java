@@ -12,7 +12,7 @@ import chess.player.Player;
 public class Pawn extends Chessman {
 
     private final boolean positive;
-    private static Attack[] attacks = { new Attack("Hello"), new Attack("Tempest"), new Attack("Seism") };
+    private static Attack[] attacks = { new Attack("Hellos"), new Attack("Tempest"), new Attack("Seism") };
 
     public Pawn(Player player, boolean positive) {
         super("pawn", player, 10, attacks);

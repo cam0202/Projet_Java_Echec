@@ -99,20 +99,20 @@ public class GameCLI extends Game {
                         break;
                     }
 
-                    case "move": {
+                    case "play": {
                         if (server == null) {
                             System.err.println("Not connected!");
                             break;
                         }
 
-                        System.out.print("Enter your move: ");
+                        System.out.print("Enter your play: ");
                         command = scanner.next();
                         System.out.println();
                         try {
-                            server.move(command);
-                            System.out.println("Executed move '" + command + "'");
+                            server.play(command);
+                            System.out.println("Executed play '" + command + "'");
                         } catch (IOException e) {
-                            System.err.println("Move failed: " + e.getMessage());
+                            System.err.println("Play failed: " + e.getMessage());
                         }
                         break;
                     }
@@ -128,10 +128,10 @@ public class GameCLI extends Game {
         }
 
         /*
-         * ┌──────── Chat ────────┐ 8 ██ ██ ██ ██ │ │ 7 ██ ██ ██ ██ │ │ 6 ██ ██ ██ ██ │
-         * │ 5 ██ ██ ██ ██ │ │ 4 ██ ██ ██ ██ │ │ 3 ██ ██ ██ ██ │ │ 2 ██ ██ ██ ██ │ │ 1
-         * ██ ██ ██ ██ │ │ a b c d e f g h │ Ceci est un message │
-         * └──────────────────────┘ ┌─ Your input ───────────────────────────────┐ └
+         * â”Œâ”€â”€â”€â”€â”€â”€â”€â”€ Chat â”€â”€â”€â”€â”€â”€â”€â”€â”� 8 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ 7 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ 6 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚
+         * â”‚ 5 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ 4 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ 3 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ 2 â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ 1
+         * â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â–ˆâ–ˆ â”‚ â”‚ a b c d e f g h â”‚ Ceci est un message â”‚
+         * â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”Œâ”€ Your input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”� â””
          */
 
         /*

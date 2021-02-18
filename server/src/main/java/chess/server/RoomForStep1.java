@@ -24,20 +24,33 @@ public class RoomForStep1 {
     }
 
     public void doCommand(Player player, String command) {
-        if (command.length() != 4) {
-            throw new RuntimeException("invalid command");
+    	char[] data = command.toLowerCase().toCharArray();
+        LOGGER.debug("PLAY command " + Arrays.toString(data));
+        
+        // cas du déplacement 
+        if (command.length() == 4) {
+        	  try {
+                  Move move = new Move(data[0], data[1], data[2], data[3]);
+                  this.board.play(player, move, null);
+                  LOGGER.debug("Move " + Arrays.toString(data));
+              } catch (BoardException e) {
+              	System.err.println(e.getMessage());
+              }
+        } else {
+        	// cas de l'attaque
+            
+            String attack = "";
+            for(int i = 0; i < data.length; i++) {
+            	attack += data[i];
+            }
+            try {
+    			this.board.play(player, null, attack);
+    			LOGGER.debug("Attack " + attack);
+    		} catch (BoardException e) {
+    			System.err.println(e.getMessage());
+    		}
         }
-
-        char[] data = command.toLowerCase().toCharArray();
-        LOGGER.debug("MOVE command " + Arrays.toString(data));
-
-        try {
-            Move move = new Move(data[0], data[1], data[2], data[3]);
-            this.board.move(player, move);
-
-        } catch (BoardException e) {
-            System.err.println(e.getMessage());
-        }
+        
 
         /*
          * Move move = this.board.getMove(command);

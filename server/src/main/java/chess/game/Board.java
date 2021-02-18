@@ -15,9 +15,12 @@ public class Board {
     private int[] value;
 
     private Player whoIsNext;
+    
+    private Chessman whoIsNextAttack;  
+    private Chessman c1attack;
+    private Chessman c2attack;
 
     private Square[][] board;
-    private Fight fightPlayer;
 
     public Board(final Player white, Player black) {
     	// init joueur 
@@ -26,8 +29,11 @@ public class Board {
         // init tableau de score
         this.score = new int[2];
         
-        // init joueur suivant 
+        // init joueur suivant dep
         this.whoIsNext = black;
+        
+        // init attaque 
+        this.whoIsNextAttack = null;
         
         // init des 64 case de l'échequier
         this.board = new Square[8][8];
@@ -85,50 +91,27 @@ public class Board {
     
     /**
      * move, movement sur le plateau 
-     * @param player
+     * @param chessman
      * @param move
      * @return String 
      * @throws BoardException
      */
-    public String move(Player player, Move move) throws BoardException {
-        
-    	// exceptions
-    	if(this.fightPlayer != null) {
-    		throw new BoardException("Sorry you can't move, have fight in the game.");
-    	}
-    	
-    	if (!this.whoIsNext.equals(player)) {
-            throw new BoardException("it's not your turn");
-        }
+    public String move(Chessman chessman, Move move) throws BoardException {
 
-        if (move.isNull()) {
-            throw new BoardException("this move is null");
-        }
-
-        Chessman chessman = this.board[move.getStart().getRow()][move.getStart().getCol()].getChessman();
-
-        if (chessman == null) {
-            throw new BoardException("there is no chessman on " + move.getStart());
-        }
-
-        if (!player.equals(chessman.getPlayer())) {
-            throw new BoardException(chessman.getName() + " at " + move.getStart() + " does not belong to you");
-        }
-
-        if (!chessman.canMove(move)) {
-            throw new BoardException(chessman.getName() + " cannot move to " + move.getEnd());
-        }
-        
         //vérification du déplacement 
         Chessman inTheWay = this.inTheWay(chessman, move);
         if (inTheWay != null) {
         	if(inTheWay.getPlayer().equals(this.white)) {
-        		this.fightPlayer = new Fight(inTheWay, chessman, inTheWay);
+        		this.c1attack = inTheWay;
+        		this.c2attack = chessman;
+        		this.whoIsNextAttack = inTheWay;
         	}else {
-        		 this.fightPlayer = new Fight(chessman, inTheWay, chessman);
+        		this.c2attack = inTheWay;
+         		this.c1attack = chessman;
+         		this.whoIsNextAttack = chessman;
         	}
-            this.value = this.fightPlayer.possiblePoint();
-            return " Go to fight. " + this.fightPlayer.possibleAttack(chessman) + " " + this.fightPlayer.possibleAttack(inTheWay);
+            this.value = this.possiblePoint();
+            return " Go to fight. " + this.possibleAttack(chessman) + " " + this.possibleAttack(inTheWay);
         }
         
         // déplacement  
@@ -167,23 +150,71 @@ public class Board {
      * @return String 
      * @throws BoardException
      */
-    private String fight(String name) throws BoardException {
-    	if(this.fightPlayer == null) {
-    		throw new BoardException("Not have a fight !");
-    	}
-    	String result = this.fight(name);
-    	if(!result.contains("impact")) {
-    		if(result.equals(this.white.getName())) {
-    			this.score[0] += this.value[0];
-    			this.fightPlayer = null;
-    			return this.white.getName() + " win " + this.score[0] + " points and "+ this.black.getName() +" loose.";
-    		} else {
-    			this.score[1] += this.value[1];
-    			this.fightPlayer = null;
-    			return this.black.getName() + " win " + this.score[1] + " points and "+ this.white.getName() +" loose.";
-    		}
-    	}
-    	return result;
+    private String fight(Player player, String name) throws BoardException {
+    	Chessman c= this.whoIsNextAttack.equals(this.c1attack) ? this.c2attack : this.c1attack; 
+    	// cas du mauvais chessman en attaque
+        if(this.whoIsNextAttack.getPlayer().equals(player)){
+            throw new BoardException("it's not your turn");
+        }
+        
+        // cas de vie = 0 pour le joeur suivant 
+        if (this.whoIsNextAttack.getLive() <= 0){
+        	this.whoIsNextAttack = null;
+            return c.getPlayer().getName() + " win !";
+        }
+        
+        // chessman sans vie
+        if (c.getLive() <= 0){
+        	this.whoIsNextAttack = null;
+            return this.whoIsNextAttack.getPlayer().getName() +" win !";
+        }
+        
+        // attaque
+        Attack attack = this.chooseAttacks(c, name);
+        if(this.whoIsNextAttack.equals(this.c1attack)) {
+        	attack.setValue(this.c1attack);
+        	this.c2attack.setLive(attack.getValue());
+        }else {
+        	attack.setValue(this.c2attack);
+        	this.c1attack.setLive(attack.getValue());
+        }
+        this.whoIsNextAttack = this.whoIsNextAttack.equals(this.c1attack) ? this.c2attack : this.c1attack;
+        return c.getPlayer().getName() + " impact " + this.whoIsNextAttack.getName() + " with " + attack.getName() + " to "  + attack.getValue();
+
+    }
+    
+    /**
+     * chooseAttack, retourne l'attaque choisi
+     * @param c
+     * @param name
+     * @return Attack
+     * @throws BoardException
+     */
+    Attack chooseAttacks(Chessman c, String name) throws BoardException {
+        for(int i = 0 ; i < c.getAttacks().length ; i++){
+            if(c.getAttacks()[i].getName().toLowerCase().equals(name.toLowerCase())) return c.getAttacks()[i];
+        }
+        throw new BoardException("Attack does exist !");
+    }
+    
+    /**
+     * possibleAttack, donne les attaques d'un chessman
+     * @param c
+     * @return String 
+     */
+    public String possibleAttack(Chessman c) {
+    	return c.getName() + "can attack with " + c.getAttacks()[0].getName() 
+    			+", " + c.getAttacks()[1].getName()
+    			+", " + c.getAttacks()[2].getName()+".";
+    }
+    
+    /**
+     * possiblePoint, donne le tableau des point possible à gagner
+     * @return
+     */
+    public int[] possiblePoint() {
+    	int[] value = {this.c1attack.getLive(), this.c2attack.getLive()};
+    	return value;
     }
     
     /**
@@ -202,10 +233,43 @@ public class Board {
     	if(this.score[1] == 890 ) {
     		return this.black.getName() + " have win the game !";
     	}
-    	if(nameAttack != null) {
-    		return this.move(player, move);
+    	if(nameAttack == null && !move.isNull()) {
+    		// error
+    		if(this.whoIsNextAttack != null) {
+        		throw new BoardException("Sorry you can't move, have fight in the game.");
+        	}
+        	
+        	if (!this.whoIsNext.equals(player)) {
+                throw new BoardException("it's not your turn");
+            }
+
+            if (move.isNull()) {
+                throw new BoardException("this move is null");
+            }
+            
+            Chessman chessman = this.board[move.getStart().getRow()][move.getStart().getCol()].getChessman();
+
+            if (chessman == null) {
+                throw new BoardException("there is no chessman on " + move.getStart());
+            }
+
+            if (!player.equals(chessman.getPlayer())) {
+                throw new BoardException(chessman.getName() + " at " + move.getStart() + " does not belong to you");
+            }
+
+            if (!chessman.canMove(move)) {
+                throw new BoardException(chessman.getName() + " cannot move to " + move.getEnd());
+            }
+    		
+    		return this.move(chessman, move);
+    	} else if ((nameAttack != null) && move == null) {
+    		// error
+    		if(this.whoIsNextAttack == null) {
+        		throw new BoardException("Not have a fight !");
+        	}
+    		return this.fight(player, nameAttack);
     	} else {
-    		return this.fight(nameAttack);
+    		return "not execute move or attack !";
     	}
     }
 
