@@ -14,8 +14,6 @@ public class Message {
         public static final int PLAY = 302;
 
         public static final int KO = 400;
-
-
     }
 
     public static final int HEADER_SIZE = Integer.BYTES + Integer.BYTES;

@@ -50,15 +50,6 @@ public class RoomForStep1 {
     			System.err.println(e.getMessage());
     		}
         }
-        
-
-        /*
-         * Move move = this.board.getMove(command);
-         * 
-         * if (player.getUUID().equals(player1.getUUID())) {
-         * this.board.move(player1.color, move); } else if
-         * (player.getUUID().equals(player1.getUUID())) { this.board.move(player2.color,
-         * move); } else { throw new RuntimeException("failed to do command..."); }
-         */
     }
+    
 }
