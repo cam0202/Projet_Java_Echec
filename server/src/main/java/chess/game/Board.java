@@ -19,6 +19,7 @@ public class Board {
     private Chessman whoIsNextAttack;  
     private Chessman c1attack;
     private Chessman c2attack;
+    private Location[] locationFigth;
 
     private Square[][] board;
 
@@ -34,6 +35,7 @@ public class Board {
         
         // init attaque 
         this.whoIsNextAttack = null;
+        this.locationFigth = new Location[2];
         
         // init des 64 case de l'échequier
         this.board = new Square[8][8];
@@ -89,6 +91,18 @@ public class Board {
         return this.black;
     }
     
+    public Square[][] getBoard(){
+    	return this.board;
+    }
+    
+    public Chessman getC1attack() {
+    	return this.c1attack;
+    }
+    
+    public Chessman getC2attack() {
+    	return this.c2attack;
+    }
+    
     /**
      * move, movement sur le plateau 
      * @param chessman
@@ -101,17 +115,16 @@ public class Board {
         //vérification du déplacement 
         Chessman inTheWay = this.inTheWay(chessman, move);
         if (inTheWay != null) {
-        	if(inTheWay.getPlayer().equals(this.white)) {
-        		this.c1attack = inTheWay;
-        		this.c2attack = chessman;
-        		this.whoIsNextAttack = inTheWay;
-        	}else {
-        		this.c2attack = inTheWay;
-         		this.c1attack = chessman;
-         		this.whoIsNextAttack = chessman;
-        	}
+        	
+        	this.c1attack = inTheWay;
+        	this.c2attack = chessman;
+        	this.whoIsNextAttack = inTheWay;
+        	this.locationFigth[0] = move.getEnd();
+        	this.locationFigth[1] = move.getStart();
+        	
             this.value = this.possiblePoint();
             return " Go to fight. " + this.possibleAttack(chessman) + " " + this.possibleAttack(inTheWay);
+            
         }
         
         // déplacement  
@@ -128,7 +141,7 @@ public class Board {
      * @param move
      * @return Chessman
      */
-    private Chessman inTheWay(Chessman of, Move move) {
+    public Chessman inTheWay(Chessman of, Move move) {
         if (!(of instanceof Knight || of instanceof King)) {
             int row = move.getDirectionRow() != 0 ? move.getDirectionRow() / Math.abs(move.getDirectionRow()) : 0;
             int col = move.getDirectionCol() != 0 ? move.getDirectionCol() / Math.abs(move.getDirectionCol()) : 0;
@@ -151,23 +164,12 @@ public class Board {
      * @throws BoardException
      */
     private String fight(Player player, String name) throws BoardException {
-    	Chessman c= this.whoIsNextAttack.equals(this.c1attack) ? this.c2attack : this.c1attack; 
+    	Chessman c = this.whoIsNextAttack.equals(this.c1attack) ? this.c2attack : this.c1attack; 
     	// cas du mauvais chessman en attaque
         if(this.whoIsNextAttack.getPlayer().equals(player)){
             throw new BoardException("it's not your turn");
         }
-        
-        // cas de vie = 0 pour le joeur suivant 
-        if (this.whoIsNextAttack.getLive() <= 0){
-        	this.whoIsNextAttack = null;
-            return c.getPlayer().getName() + " win !";
-        }
-        
-        // chessman sans vie
-        if (c.getLive() <= 0){
-        	this.whoIsNextAttack = null;
-            return this.whoIsNextAttack.getPlayer().getName() +" win !";
-        }
+ 
         
         // attaque
         Attack attack = this.chooseAttacks(c, name);
@@ -233,10 +235,28 @@ public class Board {
     	if(this.score[1] == 890 ) {
     		return this.black.getName() + " have win the game !";
     	}
+    	
+        
     	if(nameAttack == null && !move.isNull()) {
     		// error
     		if(this.whoIsNextAttack != null) {
-        		throw new BoardException("Sorry you can't move, have fight in the game.");
+    	    	// chessman sans vie
+    	        if (this.c1attack.getLive() <= 0 || this.c2attack.getLive() <= 0){
+    	        	// fin combat 
+    	        	this.whoIsNextAttack = null;
+    	        	// vide les case
+    	        	this.board[this.locationFigth[0].getRow()][this.locationFigth[0].getCol()].clear();
+    	        	this.board[this.locationFigth[1].getRow()][this.locationFigth[1].getCol()].clear();
+    	        	//on met le bon chessman dans la case
+    	            if(this.c2attack.getLive() <= 0) {
+    	            	this.board[this.locationFigth[0].getRow()][this.locationFigth[0].getCol()].setChessman(this.c1attack);
+    	            } else {
+    	            	this.board[this.locationFigth[0].getRow()][this.locationFigth[0].getCol()].setChessman(this.c2attack);
+    	            }
+    	        } else {
+    	        	throw new BoardException("Sorry you can't move, have fight in the game.");
+    	        }
+        		
         	}
         	
         	if (!this.whoIsNext.equals(player)) {
