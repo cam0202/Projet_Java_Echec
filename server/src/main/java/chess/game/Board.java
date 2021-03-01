@@ -11,6 +11,7 @@ public class Board {
 
     private final Player white;
     private final Player black;
+    
     private int[] score;
     private int[] value;
 
@@ -249,8 +250,10 @@ public class Board {
     	        	this.board[this.locationFigth[1].getRow()][this.locationFigth[1].getCol()].clear();
     	        	//on met le bon chessman dans la case
     	            if(this.c2attack.getLive() <= 0) {
+    	            	this.score[0] += this.value[1];
     	            	this.board[this.locationFigth[0].getRow()][this.locationFigth[0].getCol()].setChessman(this.c1attack);
     	            } else {
+    	            	this.score[1] += this.value[0];
     	            	this.board[this.locationFigth[0].getRow()][this.locationFigth[0].getCol()].setChessman(this.c2attack);
     	            }
     	        } else {
