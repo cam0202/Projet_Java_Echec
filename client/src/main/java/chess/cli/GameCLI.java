@@ -1,7 +1,6 @@
 package chess.cli;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.screen.Screen;
@@ -21,14 +20,14 @@ public class GameCLI extends Game {
     private final DefaultTerminalFactory factory;
     private final GameCLIWindow window;
 
-    private Server server;
+    private final Server server;
 
     public GameCLI() throws IOException {
         this.factory = new DefaultTerminalFactory();
         this.factory.setPreferTerminalEmulator(false);
         this.window = new GameCLIWindow();
 
-        this.server = null;
+        this.server = new Server();
     }
 
     public void switchPanel(final GameCLIPanel newPanel) {
@@ -47,36 +46,6 @@ public class GameCLI extends Game {
         return this.server;
     }
 
-    public boolean joinServer(final InetAddress address, final int port) {
-        if (this.server != null) {
-            throw new IllegalStateException("already joined a server");
-        }
-
-        try {
-            this.server = new Server(address, port);
-            this.server.connect();
-            return true;
-        } catch (IOException e) {
-            this.server = null;
-            return false;
-        }
-    }
-
-    public boolean leaveServer() {
-        if (this.server == null) {
-            throw new IllegalStateException("already left server");
-        }
-
-        try {
-            this.server.disconnect();
-            this.server = null;
-            return true;
-        } catch (IOException e) {
-            this.server = null;
-            return false;
-        }
-    }
-
     @Override
     public void loop() {
         try (Terminal terminal = this.factory.createTerminal()) {
@@ -89,7 +58,13 @@ public class GameCLI extends Game {
                 gui.addWindow(this.window);
 
                 GameCLIPanel panel = new GameCLIPanelHome(this);
-                panel.update();
+                Thread t = new Thread(new Runnable(){
+                    @Override
+                    public void run() {
+                        panel.update();
+                    }
+                });
+                t.start();
                 
                 this.window.setCloseWindowWithEscape(true); // TODO: temporary
                 this.window.setComponent(panel);

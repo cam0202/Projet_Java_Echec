@@ -1,7 +1,7 @@
 package chess.cli;
 
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.EmptySpace;
@@ -57,9 +57,11 @@ public class GameCLIPanelJoin extends GameCLIPanel {
                 InetAddress address = InetAddress.getByName(this.address.getText());
                 int port = Integer.parseInt(this.port.getText());
 
+                this.panel.getGame().getServer().connect(address, port);
                 this.panel.getGame().switchPanel(new GameCLIPanelServerLobby(this.panel.getGame(), this.panel));
-            } catch (NumberFormatException e) {
-            } catch (UnknownHostException e) {
+           
+            } catch (NumberFormatException | IOException e) {
+                this.panel.getGame().switchPanel(new GameCLIPanelServerErrorConnect(this.panel.getGame(), e.getMessage(), this.panel));
             }
         }
 

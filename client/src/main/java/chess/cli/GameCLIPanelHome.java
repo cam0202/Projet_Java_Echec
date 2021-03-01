@@ -83,7 +83,7 @@ public class GameCLIPanelHome extends GameCLIPanel {
                 this.right.addComponent(server);
 
             } catch (JSONException ignore) {
-                LOGGER.debug(String.format("Server [{}]:{} return bad discovery data", packet.getAddress(),
+                LOGGER.debug(String.format("Server [{}]:{} returned bad discovery data", packet.getAddress(),
                         packet.getPort()));
             }
         }
@@ -106,7 +106,12 @@ public class GameCLIPanelHome extends GameCLIPanel {
 
         @Override
         public void run() {
-            this.panel.getGame().switchPanel(null);
+            try {
+                this.panel.getGame().getServer().connect(this.address, this.port);
+                this.panel.getGame().switchPanel(new GameCLIPanelServerLobby(this.panel.getGame(), this.panel));
+            } catch (IOException e) {
+                this.panel.getGame().switchPanel(new GameCLIPanelServerErrorConnect(this.panel.getGame(), e.getMessage(), this.panel));
+            }
         }
 
     }

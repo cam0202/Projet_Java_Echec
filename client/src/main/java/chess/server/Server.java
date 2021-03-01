@@ -22,46 +22,19 @@ import chess.network.MessageTCP;
 import chess.network.MessageUDP;
 import chess.protocol.Message;
 
-/**
- * This class wraps a TCP socket and provides useful protocol functions
- */
 public class Server {
     private static final Logger LOGGER = Logger.getLogger(Server.class);
 
-    private final Socket socketTCP;
-    private UUID clientUUID = null;
-    private boolean connected = false;
+    private Socket socketTCP;
+    private UUID clientUUID;
 
-    public Server(final InetAddress address, final int port) throws IOException {
-        this(new Socket(address, port));
-    }
-
-    public Server(final Socket socketTCP) {
-        if (socketTCP == null) {
-            throw new IllegalArgumentException("TCP socket is null");
-        }
-
-        if (!socketTCP.isConnected()) {
-            throw new IllegalArgumentException("TCP socket is not connected");
-        }
-
-        this.socketTCP = socketTCP;
-    }
-
-    public boolean isConnected() {
-        return this.connected;
-    }
-
-    public InetAddress getAddress() {
-        return this.socketTCP.getInetAddress();
-    }
-
-    public int getPort() {
-        return this.socketTCP.getPort();
+    public Server() {
+        this.socketTCP = null;
     }
 
     public static List<MessagePacket> discover() throws IOException {
         try (DatagramSocket socket = new DatagramSocket()) {
+            // Broadcast packets are slow 
             socket.setSoTimeout(600);
 
             Map<UUID, MessagePacket> servers = new HashMap<>();
@@ -88,7 +61,7 @@ public class Server {
                             servers.put(uuid, packet);
                         } else if (current.getAddress() instanceof Inet4Address
                                 && packet.getAddress() instanceof Inet6Address) {
-                            servers.put(uuid, packet);
+                            servers.put(uuid, packet); // Replace IPv4 with IPv6 version
                         }
 
                     } catch (JSONException e) {
@@ -105,10 +78,16 @@ public class Server {
         }
     }
 
-    public void connect() throws IOException {
-        if (this.connected) {
-            throw new IllegalStateException("already connected to server");
+    public void connect(final InetAddress address, final int port) throws IOException {
+        if (this.socketTCP != null) {
+            throw new IllegalStateException("already connected to a server");
         }
+
+        if (address == null) {
+            throw new IllegalArgumentException("address is null");
+        }
+
+        Socket socket = new Socket(address, port);
 
         Message request = new Message(Message.Type.CONNECT);
         try {
@@ -119,11 +98,11 @@ public class Server {
             throw new IOException("failed to create request");
         }
 
-        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
+        MessageTCP.send(socket, new MessagePacket(socket, request));
 
-        Message response = MessageTCP.receive(this.socketTCP).getMessage();
+        Message response = MessageTCP.receive(socket).getMessage();
         if (response.getType() != Message.Type.OK) {
-            throw new IOException("failed to connect: " + response.getData());
+            throw new IOException(response.getData());
         }
 
         UUID uuid = null;
@@ -135,11 +114,11 @@ public class Server {
         }
 
         this.clientUUID = uuid;
-        this.connected = true;
+        this.socketTCP = socket;
     }
 
     public void disconnect() throws IOException {
-        if (!this.connected) {
+        if (this.socketTCP == null) {
             throw new IllegalStateException("already disconnected from server");
         }
 
@@ -149,18 +128,18 @@ public class Server {
             root.put("uuid", this.clientUUID.toString());
             request.setData(root.toString());
         } catch (JSONException e) {
-            throw new IOException("failed to create request");
+            throw new IOException("failed to create disconnect request");
         }
 
         MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
 
         Message response = MessageTCP.receive(this.socketTCP).getMessage();
         if (response.getType() != Message.Type.OK) {
-            throw new IOException("failed to disconnect: " + response.getData());
+            throw new IOException(response.getData());
         }
 
         this.clientUUID = null;
-        this.connected = false;
+        this.socketTCP = null;
     }
 
     // TODO: REMOVE
@@ -169,7 +148,7 @@ public class Server {
             throw new IllegalArgumentException("command is null");
         }
 
-        if (!this.connected) {
+        if (this.socketTCP == null) {
             throw new IllegalStateException("not connected");
         }
 

@@ -16,7 +16,7 @@ class App extends Thread {
     @Override
     public void run() {
         Logger loggerRoot = Logger.getRootLogger();
-        loggerRoot.setLevel(Level.ALL);
+        loggerRoot.setLevel(Level.WARN);
         
         // TODO: log elsewhere, because console is used
         ConsoleAppender loggerConsole = new ConsoleAppender();
