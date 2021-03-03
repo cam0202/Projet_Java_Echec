@@ -135,7 +135,10 @@ public class Board {
      * @throws BoardException
      */
     public String move(Chessman chessman, Move move) throws BoardException {
-
+    	
+    	// changement de joueur
+    	this.whoIsNext = this.whoIsNext.equals(this.white) ? this.black : this.white;
+    	
         //vérification du déplacement 
         Chessman inTheWay = this.inTheWay(chessman, move);
         if (inTheWay != null) {
@@ -154,7 +157,7 @@ public class Board {
         // déplacement  
         this.board[move.getEnd().getRow()][move.getEnd().getCol()].setChessman(chessman);
         this.board[move.getStart().getRow()][move.getStart().getCol()].clear();
-        this.whoIsNext = this.whoIsNext.equals(this.white) ? this.black : this.white;
+        
 
         return chessman.getPlayer().getName() + " moved " + chessman.getName() + " to " + move.getEnd().toString();
     }
