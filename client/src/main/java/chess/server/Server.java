@@ -147,7 +147,7 @@ public class Server {
     }
 
     // TODO: REMOVE
-    public void move(String command) throws IOException {
+    public void play(String command) throws IOException {
         if (command == null) {
             throw new IllegalArgumentException("command is null");
         }
@@ -156,7 +156,7 @@ public class Server {
             throw new IllegalStateException("not connected");
         }
 
-        Message request = new Message(Message.Type.MOVE);
+        Message request = new Message(Message.Type.PLAY);
         try {
             JSONObject root = new JSONObject();
             root.put("uuid", this.clientUUID.toString());

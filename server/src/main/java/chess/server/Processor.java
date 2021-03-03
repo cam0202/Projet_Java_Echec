@@ -75,8 +75,8 @@ class Processor {
             case Message.Type.DISCONNECT:
                 return processDISCONNECT(request);
 
-            case Message.Type.MOVE:
-                return processMOVE(request);
+            case Message.Type.PLAY:
+                return processPLAY(request);
 
             default: {
                 return new MessagePacket(request, this.error("unknown message type"));
@@ -204,10 +204,7 @@ class Processor {
         return new MessagePacket(request, new Message(Message.Type.OK));
     }
 
-    /**
-     * Handler for MOVE request
-     */
-    private MessagePacket processMOVE(final MessagePacket request) {
+    private MessagePacket processPLAY(final MessagePacket request) {
         if (request.getMessage().getData().length() <= 0) {
             return new MessagePacket(request, this.error("payload is empty"));
         }

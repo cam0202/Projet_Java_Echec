@@ -1,15 +1,33 @@
 package chess.game;
 
+/**
+ * 
+ * Location Class 
+ * sert à representer une coordonnee sur l'echiquier
+ *
+ */
 public class Location {
 
     private final int row;
     private final int col;
-
+    
+    /**
+     * Location constructeur
+     * @param letter
+     * @param number
+     * @throws BoardException
+     */
     public Location(char letter, char number) throws BoardException {
         this.row = this.convertRow(letter);
         this.col = this.convertCol(number);
     }
-
+    
+    /**
+     * Location constructeur
+     * @param row
+     * @param col
+     * @throws BoardException
+     */
     public Location(int row, int col) throws BoardException {
         if (!(0 <= row && row < 8)) {
             throw new BoardException("row " + row + " is invalid");
@@ -22,23 +40,46 @@ public class Location {
         this.row = row;
         this.col = col;
     }
-
+    
+    /**
+     * getLetter, donne la lettre du déplacement
+     * @return char
+     * @throws BoardException
+     */
     public char getLetter() throws BoardException {
         return this.convertRow(this.row);
     }
-
+    
+    /**
+     * getNumber, numéro du déplacement 
+     * @return char
+     * @throws BoardException
+     */
     public char getNumber() throws BoardException {
         return this.convertCol(this.col);
     }
-
+    
+    /**
+     * getRow 
+     * @return int
+     */
     public int getRow() {
         return this.row;
     }
-
+    
+    /**
+     * getCol
+     * @return int
+     */
     public int getCol() {
         return this.col;
     }
 
+    /**
+     * Fonction de conversion
+     * @throws BoardException
+     */
+    
     private char convertRow(int row) throws BoardException {
         switch (row) {
             case 0:
