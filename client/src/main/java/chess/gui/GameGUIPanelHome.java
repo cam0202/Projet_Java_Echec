@@ -55,7 +55,7 @@ public class GameGUIPanelHome extends GameGUIPanel {
 
         List<MessagePacket> servers = new ArrayList<>();
         try {
-            servers = Server.discover();
+            servers = this.getGame().getServer().discover();
         } catch (IOException e) {
             LOGGER.error("Failed to discover local servers", e);
         }

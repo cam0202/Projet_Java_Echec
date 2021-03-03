@@ -2,6 +2,7 @@ package chess.game;
 
 import java.io.IOException;
 
+import chess.cli.GameCLI;
 import chess.gui.GameGUI;
 
 /**
@@ -11,7 +12,7 @@ import chess.gui.GameGUI;
  */
 public class GameFactory {
     private final boolean useGUI = true;
-    
+
     public GameFactory() {
 
     }
@@ -23,7 +24,8 @@ public class GameFactory {
         if (useGUI) {
             return new GameGUI();
         }
-
-        return null;
+        else {
+            return new GameCLI();
+        }
     }
 }

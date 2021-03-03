@@ -32,7 +32,11 @@ public class Server {
         this.socketTCP = null;
     }
 
-    public static List<MessagePacket> discover() throws IOException {
+    public boolean isConnected() {
+        return this.socketTCP != null;
+    }
+
+    public List<MessagePacket> discover() throws IOException {
         try (DatagramSocket socket = new DatagramSocket()) {
             // Broadcast packets are slow 
             socket.setSoTimeout(600);
