@@ -1,4 +1,4 @@
-package chess.cli;
+package chess.gui;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -22,18 +22,18 @@ import org.json.JSONObject;
 import chess.network.MessagePacket;
 import chess.server.Server;
 
-public class GameCLIPanelHome extends GameCLIPanel {
+public class GameGUIPanelHome extends GameGUIPanel {
 
-    private static final Logger LOGGER = Logger.getLogger(GameCLIPanelHome.class);
+    private static final Logger LOGGER = Logger.getLogger(GameGUIPanelHome.class);
 
     private final Panel left; // Option selector
     private final Panel right; // Available servers
 
-    public GameCLIPanelHome(final GameCLI game) {
+    public GameGUIPanelHome(final GameGUI game) {
         this(game, null);
     }
 
-    public GameCLIPanelHome(final GameCLI game, final GameCLIPanel previous) {
+    public GameGUIPanelHome(final GameGUI game, final GameGUIPanel previous) {
         super(game, previous);
 
         this.left = new Panel();
@@ -93,12 +93,12 @@ public class GameCLIPanelHome extends GameCLIPanel {
         this.addComponent(this.right.withBorder(Borders.singleLineBevel(" Available servers ")));
     }
 
-    private class ActionJoinAuto extends GameCLIAction {
+    private class ActionJoinAuto extends GameGUIAction {
 
         private final InetAddress address;
         private final int port;
 
-        public ActionJoinAuto(final GameCLIPanel panel, final InetAddress address, final int port) {
+        public ActionJoinAuto(final GameGUIPanel panel, final InetAddress address, final int port) {
             super(panel);
             this.address = address;
             this.port = port;
@@ -108,43 +108,43 @@ public class GameCLIPanelHome extends GameCLIPanel {
         public void run() {
             try {
                 this.panel.getGame().getServer().connect(this.address, this.port);
-                this.panel.getGame().switchPanel(new GameCLIPanelServerLobby(this.panel.getGame(), this.panel));
+                this.panel.getGame().switchPanel(new GameGUIPanelServerLobby(this.panel.getGame(), this.panel));
             } catch (IOException e) {
-                this.panel.getGame().switchPanel(new GameCLIPanelServerErrorConnect(this.panel.getGame(), e.getMessage(), this.panel));
+                this.panel.getGame().switchPanel(new GameGUIPanelServerErrorConnect(this.panel.getGame(), e.getMessage(), this.panel));
             }
         }
 
     }
 
-    private class ActionJoinManual extends GameCLIAction {
+    private class ActionJoinManual extends GameGUIAction {
 
-        public ActionJoinManual(final GameCLIPanel panel) {
+        public ActionJoinManual(final GameGUIPanel panel) {
             super(panel);
         }
 
         @Override
         public void run() {
-            this.panel.getGame().switchPanel(new GameCLIPanelJoin(this.panel.getGame(), this.panel));
+            this.panel.getGame().switchPanel(new GameGUIPanelJoin(this.panel.getGame(), this.panel));
         }
 
     }
 
-    private class ActionSettings extends GameCLIAction {
+    private class ActionSettings extends GameGUIAction {
 
-        public ActionSettings(final GameCLIPanel panel) {
+        public ActionSettings(final GameGUIPanel panel) {
             super(panel);
         }
 
         @Override
         public void run() {
-            this.panel.getGame().switchPanel(new GameCLIPanelSettings(this.panel.getGame(), this.panel));
+            this.panel.getGame().switchPanel(new GameGUIPanelSettings(this.panel.getGame(), this.panel));
         }
 
     }
 
-    private class ActionQuit extends GameCLIAction {
+    private class ActionQuit extends GameGUIAction {
 
-        public ActionQuit(final GameCLIPanel panel) {
+        public ActionQuit(final GameGUIPanel panel) {
             super(panel);
         }
 

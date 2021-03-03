@@ -1,4 +1,4 @@
-package chess.cli;
+package chess.gui;
 
 import java.io.IOException;
 
@@ -7,15 +7,15 @@ import com.googlecode.lanterna.gui2.Label;
 
 import org.apache.log4j.Logger;
 
-public class GameCLIPanelServerLobby extends GameCLIPanel {
+public class GameGUIPanelServerLobby extends GameGUIPanel {
 
-    private static final Logger LOGGER = Logger.getLogger(GameCLIPanelServerLobby.class);
+    private static final Logger LOGGER = Logger.getLogger(GameGUIPanelServerLobby.class);
 
-    public GameCLIPanelServerLobby(final GameCLI game) {
+    public GameGUIPanelServerLobby(final GameGUI game) {
         this(game, null);
     }
 
-    public GameCLIPanelServerLobby(final GameCLI game, final GameCLIPanel previous) {
+    public GameGUIPanelServerLobby(final GameGUI game, final GameGUIPanel previous) {
         super(game, previous);
 
         this.addComponent(new Button("Go back", new ActionBackWrapper(this)));
@@ -29,7 +29,7 @@ public class GameCLIPanelServerLobby extends GameCLIPanel {
 
     private class ActionBackWrapper extends ActionBack {
 
-        public ActionBackWrapper(GameCLIPanel panel) {
+        public ActionBackWrapper(GameGUIPanel panel) {
             super(panel);
         }
 

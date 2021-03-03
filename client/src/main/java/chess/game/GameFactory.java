@@ -2,7 +2,7 @@ package chess.game;
 
 import java.io.IOException;
 
-import chess.cli.GameCLI;
+import chess.gui.GameGUI;
 
 /**
  * This program is intended to be used in a terminal, but we still want to be
@@ -10,6 +10,8 @@ import chess.cli.GameCLI;
  * allows to select the type of front-end we want
  */
 public class GameFactory {
+    private final boolean useGUI = true;
+    
     public GameFactory() {
 
     }
@@ -18,6 +20,10 @@ public class GameFactory {
      * Creates an appropriate front-end for the context
      */
     public Game createGame() throws IOException {
-        return new GameCLI();
+        if (useGUI) {
+            return new GameGUI();
+        }
+
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-package chess.cli;
+package chess.gui;
 
 import java.io.IOException;
 
@@ -13,24 +13,24 @@ import org.apache.log4j.Logger;
 import chess.game.Game;
 import chess.server.Server;
 
-public class GameCLI extends Game {
+public class GameGUI extends Game {
     
-    private static final Logger LOGGER = Logger.getLogger(GameCLI.class);
+    private static final Logger LOGGER = Logger.getLogger(GameGUI.class);
 
     private final DefaultTerminalFactory factory;
-    private final GameCLIWindow window;
+    private final GameGUIWindow window;
 
     private final Server server;
 
-    public GameCLI() throws IOException {
+    public GameGUI() throws IOException {
         this.factory = new DefaultTerminalFactory();
         this.factory.setPreferTerminalEmulator(false);
-        this.window = new GameCLIWindow();
+        this.window = new GameGUIWindow();
 
         this.server = new Server();
     }
 
-    public void switchPanel(final GameCLIPanel newPanel) {
+    public void switchPanel(final GameGUIPanel newPanel) {
         if (newPanel != null) {
             newPanel.update();
         }
@@ -38,7 +38,7 @@ public class GameCLI extends Game {
         this.window.setComponent(newPanel);
     }
 
-    public GameCLIWindow getWindow() {
+    public GameGUIWindow getWindow() {
         return this.window;
     }
 
@@ -57,7 +57,7 @@ public class GameCLI extends Game {
                 MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
                 gui.addWindow(this.window);
 
-                GameCLIPanel panel = new GameCLIPanelHome(this);
+                GameGUIPanel panel = new GameGUIPanelHome(this);
                 Thread t = new Thread(new Runnable(){
                     @Override
                     public void run() {

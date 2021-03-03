@@ -1,4 +1,4 @@
-package chess.cli;
+package chess.gui;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,13 +9,13 @@ import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.TextBox;
 
-public class GameCLIPanelJoin extends GameCLIPanel {
+public class GameGUIPanelJoin extends GameGUIPanel {
 
-    public GameCLIPanelJoin(final GameCLI game) {
+    public GameGUIPanelJoin(final GameGUI game) {
         this(game, null);
     }
 
-    public GameCLIPanelJoin(final GameCLI game, final GameCLIPanel previous) {
+    public GameGUIPanelJoin(final GameGUI game, final GameGUIPanel previous) {
         super(game, previous);
 
         this.setLayoutManager(new GridLayout(2));
@@ -40,12 +40,12 @@ public class GameCLIPanelJoin extends GameCLIPanel {
         // Nothing to do here
     }
 
-    private class ActionJoin extends GameCLIAction {
+    private class ActionJoin extends GameGUIAction {
 
         private final TextBox address;
         private final TextBox port;
 
-        public ActionJoin(final GameCLIPanel panel, final TextBox address, final TextBox port) {
+        public ActionJoin(final GameGUIPanel panel, final TextBox address, final TextBox port) {
             super(panel);
             this.address = address;
             this.port = port;
@@ -58,10 +58,10 @@ public class GameCLIPanelJoin extends GameCLIPanel {
                 int port = Integer.parseInt(this.port.getText());
 
                 this.panel.getGame().getServer().connect(address, port);
-                this.panel.getGame().switchPanel(new GameCLIPanelServerLobby(this.panel.getGame(), this.panel));
+                this.panel.getGame().switchPanel(new GameGUIPanelServerLobby(this.panel.getGame(), this.panel));
            
             } catch (NumberFormatException | IOException e) {
-                this.panel.getGame().switchPanel(new GameCLIPanelServerErrorConnect(this.panel.getGame(), e.getMessage(), this.panel));
+                this.panel.getGame().switchPanel(new GameGUIPanelServerErrorConnect(this.panel.getGame(), e.getMessage(), this.panel));
             }
         }
 

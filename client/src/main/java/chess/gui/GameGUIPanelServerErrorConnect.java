@@ -1,10 +1,10 @@
-package chess.cli;
+package chess.gui;
 
 import com.googlecode.lanterna.gui2.Label;
 
-public class GameCLIPanelServerErrorConnect extends GameCLIPanelServerError {
+public class GameGUIPanelServerErrorConnect extends GameGUIPanelServerError {
 
-    public GameCLIPanelServerErrorConnect(final GameCLI game, final String error, final GameCLIPanel previous) {
+    public GameGUIPanelServerErrorConnect(final GameGUI game, final String error, final GameGUIPanel previous) {
         super(game, error, previous);
 
         this.addComponent(new Label("Failed to connect to server: " + this.error));

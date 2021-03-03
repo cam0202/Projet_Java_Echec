@@ -1,4 +1,4 @@
-package chess.cli;
+package chess.gui;
 
 import java.util.Arrays;
 
@@ -9,10 +9,10 @@ import com.googlecode.lanterna.gui2.Window;
 
 import org.apache.log4j.Logger;
 
-public class GameCLIWindow extends BasicWindow {
-    private static final Logger LOGGER = Logger.getLogger(GameCLIWindow.class);
+public class GameGUIWindow extends BasicWindow {
+    private static final Logger LOGGER = Logger.getLogger(GameGUIWindow.class);
 
-    protected GameCLIWindow() {
+    protected GameGUIWindow() {
         this.setTitle(" Chess Game ");
         this.setHints(Arrays.asList(
             Window.Hint.FULL_SCREEN,

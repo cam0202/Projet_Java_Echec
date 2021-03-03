@@ -1,17 +1,17 @@
-package chess.cli;
+package chess.gui;
 
 import com.googlecode.lanterna.gui2.Panel;
 
-public abstract class GameCLIPanel extends Panel {
+public abstract class GameGUIPanel extends Panel {
     
-    private final GameCLI game;
-    private final GameCLIPanel previous;
+    private final GameGUI game;
+    private final GameGUIPanel previous;
 
-    public GameCLIPanel(final GameCLI game) {
+    public GameGUIPanel(final GameGUI game) {
         this(game, null);
     }
 
-    public GameCLIPanel(final GameCLI game, final GameCLIPanel previous) {
+    public GameGUIPanel(final GameGUI game, final GameGUIPanel previous) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null");
         }
@@ -20,15 +20,15 @@ public abstract class GameCLIPanel extends Panel {
         this.previous = previous;
     }
 
-    protected GameCLI getGame() {
+    protected GameGUI getGame() {
         return this.game;
     }
 
     public abstract void update();
 
-    protected class ActionBack extends GameCLIAction {
+    protected class ActionBack extends GameGUIAction {
 
-        public ActionBack(final GameCLIPanel panel) {
+        public ActionBack(final GameGUIPanel panel) {
             super(panel);
         }
 

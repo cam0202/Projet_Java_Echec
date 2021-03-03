@@ -1,15 +1,15 @@
-package chess.cli;
+package chess.gui;
 
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Label;
 
-public class GameCLIPanelSettings extends GameCLIPanel {
+public class GameGUIPanelSettings extends GameGUIPanel {
 
-    public GameCLIPanelSettings(GameCLI game) {
+    public GameGUIPanelSettings(GameGUI game) {
         this(game, null);
     }
 
-    public GameCLIPanelSettings(GameCLI game, GameCLIPanel previous) {
+    public GameGUIPanelSettings(GameGUI game, GameGUIPanel previous) {
         super(game, previous);
 
         this.addComponent(new Button("Go back", new ActionBack(this)));
