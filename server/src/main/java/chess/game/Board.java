@@ -319,7 +319,7 @@ public class Board {
     		return this.move(chessman, move);
     	} else if ((nameAttack != null) && move == null) {
     		// error
-    		if(this.whoIsNextAttack == null) {
+    		if(this.c1attack.getLive() <= 0 || this.c2attack.getLive() <= 0) {
         		throw new BoardException("Not have a fight !");
         	}
     		return this.fight(player, nameAttack);
