@@ -15,6 +15,7 @@ public class Message {
         public static final int CONNECT = 300;
         public static final int DISCONNECT = 301;
         public static final int PLAY = 302;
+        public static final int PUSH = 303;
 
         public static final int KO = 400;
     }

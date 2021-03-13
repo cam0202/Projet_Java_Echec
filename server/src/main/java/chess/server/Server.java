@@ -3,7 +3,10 @@ package chess.server;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -11,12 +14,15 @@ import org.apache.log4j.Logger;
 import chess.player.Player;
 
 /**
- * This class represents the server instance. It launches one TCP and one UDP listener
+ * This class represents the server instance. It launches one TCP and one UDP
+ * listener
  */
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
-    private final HashMap<UUID, Player> players = new HashMap<>();
+    private final Map<UUID, Player> players = new HashMap<>();
+
+    private final Map<UUID, Room> rooms = new HashMap<>();
 
     private final int port;
     private final UUID uuid;
@@ -42,12 +48,21 @@ public class Server {
         }
 
         this.players.put(uuid, player);
+
+        LOGGER.debug("User " + player.getName() + " joined the server");
     }
 
     public void removePlayer(final UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("uuid cannot be null");
         }
+
+        Player player = this.players.get(uuid);
+        if (player == null) {
+            throw new IllegalArgumentException("this player does not exists");
+        }
+
+        LOGGER.debug("User " + player.getName() + " left the server");
 
         this.players.remove(uuid);
     }
@@ -79,6 +94,28 @@ public class Server {
         return this.room;
     }
 
+    public void trackRoom(final Room room) {
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+
+        this.rooms.put(room.getPlayerWhite().getUUID(), room);
+        this.rooms.put(room.getPlayerBlack().getUUID(), room);
+    }
+
+    public void untrackRoom(final Room room) {
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+
+        this.rooms.remove(room.getPlayerWhite().getUUID());
+        this.rooms.remove(room.getPlayerBlack().getUUID());
+    }
+
+    public Room getRoom(final UUID playerUUID) {
+        return this.rooms.get(playerUUID);
+    }
+
     public UUID getUUID() {
         return this.uuid;
     }
@@ -108,30 +145,33 @@ public class Server {
     }
 
     public void loop() {
-        ListenerTCP listenerTCP = null;
-        ListenerUDP listenerUDP = null;
+        ServerRunner listenerTCP = null;
+        ServerRunner listenerUDP = null;
 
         try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
             listenerTCP = new ListenerTCP(this, socketTCP);
-            listenerTCP.start();
+            listenerUDP = new ListenerUDP(this, socketUDP);
+
+            Thread t1 = new Thread(listenerTCP);
+            t1.start();
 
             LOGGER.debug("Started TCP listener");
 
-            listenerUDP = new ListenerUDP(this, socketUDP);
-            listenerUDP.start();
+            Thread t2 = new Thread(listenerUDP);
+            t2.start();
 
             LOGGER.debug("Started UDP listener");
 
-            listenerTCP.join();
-            listenerUDP.join();
+            t1.join();
+            t2.join();
 
         } catch (InterruptedException e) {
             LOGGER.debug("Interrupting listeners...");
 
             if (listenerTCP != null)
-                listenerTCP.interrupt();
+                listenerTCP.requireStop();
             if (listenerUDP != null)
-                listenerUDP.interrupt();
+                listenerUDP.requireStop();
 
         } catch (IOException e) {
             LOGGER.fatal("Failed to create server listeners", e);

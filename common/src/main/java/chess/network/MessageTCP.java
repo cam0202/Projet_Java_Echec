@@ -1,10 +1,11 @@
 package chess.network;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.concurrent.TimeoutException;
 
 import chess.protocol.Message;
 
@@ -25,10 +26,10 @@ public class MessageTCP {
         out.flush();
     }
 
-    public static MessagePacket receive(final Socket socketTCP) throws IOException {
+    public static MessagePacket receive(final Socket socketTCP) throws IOException, TimeoutException {
         validateSocket(socketTCP);
 
-        BufferedInputStream in = new BufferedInputStream(socketTCP.getInputStream());
+        DataInputStream in = new DataInputStream(socketTCP.getInputStream());
 
         byte[] header = new byte[Message.HEADER_SIZE];
         fillBufferFromStream(in, header);
@@ -54,14 +55,33 @@ public class MessageTCP {
         }
     }
 
-    private static void fillBufferFromStream(final InputStream stream, final byte[] buffer) throws IOException {
+    private static void fillBufferFromStream(final InputStream stream, final byte[] buffer)
+            throws IOException, TimeoutException {
+
+        long timeout = System.currentTimeMillis() + 1000;
         int cursor = 0;
         while (cursor < buffer.length) {
-            int r = stream.read(buffer, cursor, buffer.length - cursor);
+            int toRead = Math.min(stream.available(), buffer.length - cursor);
+
+            // If no data was received at all, trigger timeout
+            if (toRead <= 0 && System.currentTimeMillis() >= timeout) {
+                throw new TimeoutException("timeout while receiving stream data");
+            }
+
+            int r = stream.read(buffer, cursor, toRead);
             if (r == -1) {
                 throw new IOException("failed to read bytes from stream");
             } else {
                 cursor += r;
+            }
+
+            // The timeout system makes this method an active wait, which is terrible
+            // so we make the thread sleep a bit to free resources
+            if (toRead <= 0) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignore) {
+                }
             }
         }
     }

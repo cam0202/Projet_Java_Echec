@@ -7,6 +7,8 @@ import com.googlecode.lanterna.gui2.Label;
 
 import org.apache.log4j.Logger;
 
+import chess.server.Callback;
+
 public class GameGUIPanelServerLobby extends GameGUIPanel {
 
     private static final Logger LOGGER = Logger.getLogger(GameGUIPanelServerLobby.class);
@@ -20,6 +22,8 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
 
         this.addComponent(new Button("Go back", new ActionBackWrapper(this)));
         this.addComponent(new Label("CONNECTED!"));
+
+        this.getGame().getServer().setUpdateCallback(new UpdateCallback());
     }
 
     @Override
@@ -36,12 +40,22 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
         @Override
         public void run() {
             try {
+                this.panel.getGame().getServer().setUpdateCallback(null);
                 this.panel.getGame().getServer().disconnect();
                 super.run();
             } catch (IOException e) {
                 LOGGER.error("Failed to disconnect from server", e);
             }
         }
+    }
+
+    private class UpdateCallback implements Callback {
+
+        @Override
+        public void onUpdate(String data) {
+            System.out.println("TEST!!");
+        }
+
     }
 
 }

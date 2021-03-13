@@ -157,8 +157,6 @@ class Processor {
             }
         }
 
-        LOGGER.debug("User " + player.getName() + " joined the server");
-
         // TODO: REMOVE
         if (this.server.getOnlinePlayers() == 2) {
             LOGGER.debug("Game started");
@@ -192,8 +190,6 @@ class Processor {
         }
 
         this.server.removePlayer(uuid);
-
-        LOGGER.debug("User " + player.getName() + " left the server");
 
         // TODO: REMOVE
         if (this.server.getOnlinePlayers() < 2) {

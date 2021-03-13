@@ -11,7 +11,7 @@ import chess.gui.GameGUI;
  * allows to select the type of front-end we want
  */
 public class GameFactory {
-    private final boolean useGUI = false;
+    private final boolean useGUI = true;
 
     public GameFactory() {
 

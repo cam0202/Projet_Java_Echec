@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  * app like this one, but we should create a worker pool if we wanted to scale
  * up.
  */
-final class ListenerTCP extends Listener {
+final class ListenerTCP extends ServerRunner {
     private final static Logger LOGGER = Logger.getLogger(ListenerTCP.class);
 
     private final ServerSocket socket;
@@ -28,7 +28,7 @@ final class ListenerTCP extends Listener {
 
     @Override
     public void run() {
-        while (!Thread.interrupted()) {
+        while (!this.shouldStop()) {
             try {
                 Socket player = socket.accept();
                 LOGGER.debug("TCP connection from player [" + player.getInetAddress() + "]:" + player.getPort());
@@ -37,7 +37,7 @@ final class ListenerTCP extends Listener {
                 worker.setDaemon(true);
                 worker.start();
 
-            } catch (SocketTimeoutException ignore) {
+            } catch (SocketTimeoutException expected) {
                 continue;
             } catch (IOException e) {
                 LOGGER.error("Failed to establish TCP connection", e);
