@@ -9,7 +9,7 @@ import chess.player.Player;
 
 public class Room {
 
-    private final static Logger LOGGER = Logger.getLogger(RoomForStep1.class);
+    private final static Logger LOGGER = Logger.getLogger(Room.class);
 
     private final Player white;
     private final Player black;
@@ -43,22 +43,18 @@ public class Room {
         return this.black;
     }
 
-    public String play(final Player player, final String command) {
+    public String play(final Player player, final String command) throws BoardException {
         LOGGER.debug("PLAY command " + command);
 
         String cmd = command.toLowerCase();
-        try {
-            if (cmd.length() == 4) {
-                // This is a MOVE command
-                char[] data = cmd.toCharArray();
-                Move move = new Move(data[0], data[1], data[2], data[3]);
-                return this.board.play(player, move, null);
-            } else {
-                // This is an ATTACK command
-                return this.board.play(player, null, cmd);
-            }
-        } catch (BoardException e) {
-            return e.getMessage();
+        if (cmd.length() == 4) {
+            // This is a MOVE command
+            char[] data = cmd.toCharArray();
+            Move move = new Move(data[0], data[1], data[2], data[3]);
+            return this.board.play(player, move, null);
+        } else {
+            // This is an ATTACK command
+            return this.board.play(player, null, cmd);
         }
     }
 

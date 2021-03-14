@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import chess.game.BoardException;
 import chess.network.MessagePacket;
 import chess.player.Player;
 import chess.protocol.Message;
@@ -160,7 +161,7 @@ class Processor {
         // TODO: REMOVE
         if (this.server.getOnlinePlayers() == 2) {
             LOGGER.debug("Game started");
-            this.server.startRoomForStep1();
+            this.server.autoAddRoom();
         }
 
         return new MessagePacket(request, response);
@@ -193,7 +194,7 @@ class Processor {
 
         // TODO: REMOVE
         if (this.server.getOnlinePlayers() < 2) {
-            this.server.endRoomForStep1();
+            this.server.autoRemoveRoom();
             LOGGER.debug("Game ended");
         }
 
@@ -221,20 +222,16 @@ class Processor {
             return new MessagePacket(request, this.error("not connected"));
         }
 
-        // TODO HANDLE ROOMS
-
-        // TODO EXEC
-        // TODO: REMOVE
-        RoomForStep1 room = this.server.getRoomForStep1();
+        Room room = this.server.getPlayerRoom(uuid);
         if (room == null) {
-            return new MessagePacket(request, this.error("game not started"));
+            return new MessagePacket(request, this.error("you are not in a game room"));
         }
         try {
-            room.doCommand(player, command);
-        } catch (RuntimeException e) {
+            Message msg = new Message(Message.Type.OK);
+            msg.setData(room.play(player, command));
+            return new MessagePacket(request, msg);
+        } catch (BoardException e) {
             return new MessagePacket(request, this.error(e.getMessage()));
         }
-
-        return new MessagePacket(request, new Message(Message.Type.OK));
     }
 }

@@ -3,9 +3,7 @@ package chess.server;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,13 +19,10 @@ public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
     private final Map<UUID, Player> players = new HashMap<>();
-
-    private final Map<UUID, Room> rooms = new HashMap<>();
+    private final Map<UUID, Room> playersToRooms = new HashMap<>();
 
     private final int port;
     private final UUID uuid;
-
-    private RoomForStep1 room = null; // TODO REMOVE
 
     public Server(final int port) {
         this.port = port;
@@ -67,8 +62,26 @@ public class Server {
         this.players.remove(uuid);
     }
 
-    // TODO: REMOVE
-    public void startRoomForStep1() {
+    public void addRoom(final Room room) {
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+
+        this.playersToRooms.put(room.getPlayerWhite().getUUID(), room);
+        this.playersToRooms.put(room.getPlayerBlack().getUUID(), room);
+    }
+
+    public void removeRoom(final Room room) {
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+
+        this.playersToRooms.remove(room.getPlayerWhite().getUUID());
+        this.playersToRooms.remove(room.getPlayerBlack().getUUID());
+    }
+
+    // TODO: remove
+    public void autoAddRoom() {
         Player p1 = null;
         Player p2 = null;
         int i = 0;
@@ -81,39 +94,17 @@ public class Server {
                 break;
             i++;
         }
-        this.room = new RoomForStep1(p1, p2);
+
+        this.addRoom(new Room(p1, p2));
     }
 
     // TODO: remove
-    public void endRoomForStep1() {
-        this.room = null;
+    public void autoRemoveRoom() {
+        this.playersToRooms.clear();
     }
 
-    // TODO: REMOVE
-    public RoomForStep1 getRoomForStep1() {
-        return this.room;
-    }
-
-    public void trackRoom(final Room room) {
-        if (room == null) {
-            throw new IllegalArgumentException("room is null");
-        }
-
-        this.rooms.put(room.getPlayerWhite().getUUID(), room);
-        this.rooms.put(room.getPlayerBlack().getUUID(), room);
-    }
-
-    public void untrackRoom(final Room room) {
-        if (room == null) {
-            throw new IllegalArgumentException("room is null");
-        }
-
-        this.rooms.remove(room.getPlayerWhite().getUUID());
-        this.rooms.remove(room.getPlayerBlack().getUUID());
-    }
-
-    public Room getRoom(final UUID playerUUID) {
-        return this.rooms.get(playerUUID);
+    public Room getPlayerRoom(final UUID playerUUID) {
+        return this.playersToRooms.get(playerUUID);
     }
 
     public UUID getUUID() {
