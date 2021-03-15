@@ -39,7 +39,7 @@ class WorkerTCP extends ServerRunner {
 
             LOGGER.debug("Request from [" + request.getAddress().toString() + "]:" + request.getPort());
 
-            Processor processor = new Processor(this.server);
+            Processor processor = new Processor(this.server, this.socket);
             MessagePacket response = processor.process(request);
 
             try {

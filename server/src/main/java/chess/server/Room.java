@@ -43,6 +43,24 @@ public class Room {
         return this.black;
     }
 
+    public void sendChatMessage(final Player sender, final String message) {
+        if (sender == null) {
+            throw new IllegalArgumentException("sender is null");
+        }
+
+        if (message == null) {
+            throw new IllegalArgumentException("message is null");
+        }
+
+        if (sender.equals(this.white)) {
+
+        } else if (sender.equals(this.black)) {
+
+        } else {
+            throw new IllegalArgumentException("player is not in this room");
+        }
+    }
+
     public String play(final Player player, final String command) throws BoardException {
         LOGGER.debug("PLAY command " + command);
 

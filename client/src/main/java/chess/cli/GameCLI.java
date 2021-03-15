@@ -108,7 +108,7 @@ public class GameCLI extends Game {
                         System.out.println();
                         try {
                             System.out.println("Sending play '" + command + "'");
-                            server.play(command);
+                            server.post(command);
                         } catch (IOException e) {
                             System.err.println("Play failed: " + e.getMessage());
                         }

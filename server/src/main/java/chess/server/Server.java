@@ -3,7 +3,9 @@ package chess.server;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -103,10 +105,6 @@ public class Server {
         this.playersToRooms.clear();
     }
 
-    public Room getPlayerRoom(final UUID playerUUID) {
-        return this.playersToRooms.get(playerUUID);
-    }
-
     public UUID getUUID() {
         return this.uuid;
     }
@@ -133,6 +131,14 @@ public class Server {
 
     public Player getPlayer(final UUID uuid) {
         return this.players.get(uuid);
+    }
+
+    public List<Player> getPlayers() {
+        return new ArrayList<Player>(this.players.values());
+    }
+
+    public Room getPlayerRoom(final UUID playerUUID) {
+        return this.playersToRooms.get(playerUUID);
     }
 
     public void loop() {

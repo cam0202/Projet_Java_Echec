@@ -42,7 +42,7 @@ final class ListenerUDP extends ServerRunner {
                 continue;
             }
 
-            Processor processor = new Processor(this.server);
+            Processor processor = new Processor(this.server, null);
             MessagePacket response = processor.process(request);
 
             try {

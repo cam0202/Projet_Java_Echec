@@ -29,6 +29,9 @@ public class Server {
     private ListenerTCP listenerTCP;
     private UUID clientUUID;
 
+    private String name;
+    private String description;
+
     public Server() {
         this.socketTCP = null;
         this.listenerTCP = null;
@@ -46,6 +49,14 @@ public class Server {
 
         assert(this.listenerTCP != null);
         this.listenerTCP.setCallback(callback);
+    }
+
+    public String getName() {
+        return "TODO NAME";
+    }
+
+    public String getDescription() {
+        return "TODO DESCRIPTION";
     }
 
     public List<MessagePacket> discover() throws IOException {
@@ -108,7 +119,7 @@ public class Server {
         Message request = new Message(Message.Type.CONNECT);
         try {
             JSONObject root = new JSONObject();
-            root.put("name", "TODO");
+            root.put("name", "User-" + socketTCP.getLocalPort());
             request.setData(root.toString());
         } catch (JSONException e) {
             throw new IOException("failed to create request");
@@ -166,21 +177,16 @@ public class Server {
         this.listenerTCP = null;
     }
 
-    // TODO: REMOVE
-    public void play(String command) throws IOException {
-        if (command == null) {
-            throw new IllegalArgumentException("command is null");
+    public void post(String message) throws IOException {
+        if (message == null) {
+            throw new IllegalArgumentException("message is null");
         }
 
-        if (this.socketTCP == null) {
-            throw new IllegalStateException("not connected");
-        }
-
-        Message request = new Message(Message.Type.PLAY);
+        Message request = new Message(Message.Type.POST);
         try {
             JSONObject root = new JSONObject();
             root.put("uuid", this.clientUUID.toString());
-            root.put("command", command);
+            root.put("payload", message);
             request.setData(root.toString());
         } catch (JSONException e) {
             throw new IOException("failed to create request");
