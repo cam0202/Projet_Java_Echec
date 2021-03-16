@@ -45,3 +45,6 @@ The default port for the server is UDP port `12345`.
         - `command`: a string containing the move command to execute on the server
     - A server's payload will be empty
 
+- `PUSH(303)`: Notification message sent by the server
+    - The payload is context dependent
+

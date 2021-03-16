@@ -14,7 +14,7 @@ import chess.network.MessageUDP;
  * synchronously. If we wanted to scale up, we should create a worker per packet
  * or a worker pool.
  */
-final class ListenerUDP extends Listener {
+final class ListenerUDP extends ServerRunner {
     private final static Logger LOGGER = Logger.getLogger(ListenerUDP.class);
 
     private final DatagramSocket socket;
@@ -30,19 +30,19 @@ final class ListenerUDP extends Listener {
 
     @Override
     public void run() {
-        while (!Thread.interrupted()) {
+        while (!this.shouldStop()) {
             MessagePacket request = null;
 
             try {
                 request = MessageUDP.receive(this.socket);
-            } catch (SocketTimeoutException ignore) {
+            } catch (SocketTimeoutException expected) {
                 continue;
             } catch (IOException e) {
                 LOGGER.error("Failed to receive UDP packet", e);
                 continue;
             }
 
-            Processor processor = new Processor(this.server);
+            Processor processor = new Processor(this.server, null);
             MessagePacket response = processor.process(request);
 
             try {

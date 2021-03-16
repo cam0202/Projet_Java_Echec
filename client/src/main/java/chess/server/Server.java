@@ -26,19 +26,45 @@ public class Server {
     private static final Logger LOGGER = Logger.getLogger(Server.class);
 
     private Socket socketTCP;
+    private ListenerTCP listenerTCP;
     private UUID clientUUID;
+
+    private String name;
+    private String description;
 
     public Server() {
         this.socketTCP = null;
+        this.listenerTCP = null;
+        this.clientUUID = null;
+
+        this.name = null;
+        this.description = null;
     }
 
     public boolean isConnected() {
         return this.socketTCP != null;
     }
 
+    public void setUpdateCallback(Callback callback) {
+        if (!this.isConnected()) {
+            throw new IllegalStateException("cannot set callback function because not connected");
+        }
+
+        assert (this.listenerTCP != null);
+        this.listenerTCP.setCallback(callback);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
     public List<MessagePacket> discover() throws IOException {
         try (DatagramSocket socket = new DatagramSocket()) {
-            // Broadcast packets are slow 
+            // Broadcast packets are slow
             socket.setSoTimeout(600);
 
             Map<UUID, MessagePacket> servers = new HashMap<>();
@@ -91,20 +117,25 @@ public class Server {
             throw new IllegalArgumentException("address is null");
         }
 
-        Socket socket = new Socket(address, port);
+        Socket socketTCP = new Socket(address, port);
 
         Message request = new Message(Message.Type.CONNECT);
         try {
             JSONObject root = new JSONObject();
-            root.put("name", "TODO");
+            root.put("name", "User-" + socketTCP.getLocalPort());
             request.setData(root.toString());
         } catch (JSONException e) {
             throw new IOException("failed to create request");
         }
 
-        MessageTCP.send(socket, new MessagePacket(socket, request));
+        ListenerTCP listenerTCP = new ListenerTCP(socketTCP);
+        Thread t1 = new Thread(listenerTCP);
+        t1.setDaemon(true);
+        t1.start();
 
-        Message response = MessageTCP.receive(socket).getMessage();
+        MessageTCP.send(socketTCP, new MessagePacket(socketTCP, request));
+
+        Message response = listenerTCP.receive().getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException(response.getData());
         }
@@ -118,7 +149,10 @@ public class Server {
         }
 
         this.clientUUID = uuid;
-        this.socketTCP = socket;
+        this.socketTCP = socketTCP;
+        this.listenerTCP = listenerTCP;
+
+        this.updateServerInfo();
     }
 
     public void disconnect() throws IOException {
@@ -137,30 +171,27 @@ public class Server {
 
         MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
 
-        Message response = MessageTCP.receive(this.socketTCP).getMessage();
+        Message response = this.listenerTCP.receive().getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException(response.getData());
         }
 
+        this.listenerTCP.requireStop();
         this.clientUUID = null;
         this.socketTCP = null;
+        this.listenerTCP = null;
     }
 
-    // TODO: REMOVE
-    public void play(String command) throws IOException {
-        if (command == null) {
-            throw new IllegalArgumentException("command is null");
+    public void post(String message) throws IOException {
+        if (message == null) {
+            throw new IllegalArgumentException("message is null");
         }
 
-        if (this.socketTCP == null) {
-            throw new IllegalStateException("not connected");
-        }
-
-        Message request = new Message(Message.Type.PLAY);
+        Message request = new Message(Message.Type.POST);
         try {
             JSONObject root = new JSONObject();
             root.put("uuid", this.clientUUID.toString());
-            root.put("command", command);
+            root.put("payload", message);
             request.setData(root.toString());
         } catch (JSONException e) {
             throw new IOException("failed to create request");
@@ -168,9 +199,36 @@ public class Server {
 
         MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
 
-        Message response = MessageTCP.receive(this.socketTCP).getMessage();
+        Message response = this.listenerTCP.receive().getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException(response.getData());
+        }
+    }
+
+    private void updateServerInfo() throws IOException {
+        Message request = new Message(Message.Type.GET);
+        try {
+            JSONObject root = new JSONObject();
+            root.put("uuid", this.clientUUID.toString());
+            root.put("scope", "server");
+            request.setData(root.toString());
+        } catch (JSONException e) {
+            throw new IOException("failed to create request");
+        }
+
+        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
+
+        Message response = this.listenerTCP.receive().getMessage();
+        if (response.getType() != Message.Type.OK) {
+            throw new IOException(response.getData());
+        }
+
+        try {
+            JSONObject root = new JSONObject(response.getData());
+            this.name = root.getString("name");
+            this.description = root.getString("description");
+        } catch (JSONException e) {
+            throw new IOException("server response is ill-formed");
         }
     }
 }

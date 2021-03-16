@@ -20,7 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import chess.network.MessagePacket;
-import chess.server.Server;
 
 public class GameGUIPanelHome extends GameGUIPanel {
 
@@ -90,7 +89,7 @@ public class GameGUIPanelHome extends GameGUIPanel {
 
         this.removeAllComponents();
         this.addComponent(this.left);
-        this.addComponent(this.right.withBorder(Borders.singleLineBevel(" Available servers ")));
+        this.addComponent(this.right.withBorder(Borders.singleLine(" Available servers ")));
     }
 
     private class ActionJoinAuto extends GameGUIAction {

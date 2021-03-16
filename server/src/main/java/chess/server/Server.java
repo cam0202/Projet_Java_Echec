@@ -3,7 +3,10 @@ package chess.server;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -11,17 +14,17 @@ import org.apache.log4j.Logger;
 import chess.player.Player;
 
 /**
- * This class represents the server instance. It launches one TCP and one UDP listener
+ * This class represents the server instance. It launches one TCP and one UDP
+ * listener
  */
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
-    private final HashMap<UUID, Player> players = new HashMap<>();
+    private final Map<UUID, Player> players = new HashMap<>();
+    private final Map<UUID, Room> playersToRooms = new HashMap<>();
 
     private final int port;
     private final UUID uuid;
-
-    private RoomForStep1 room = null; // TODO REMOVE
 
     public Server(final int port) {
         this.port = port;
@@ -42,6 +45,8 @@ public class Server {
         }
 
         this.players.put(uuid, player);
+
+        LOGGER.debug("User " + player.getName() + " joined the server");
     }
 
     public void removePlayer(final UUID uuid) {
@@ -49,11 +54,36 @@ public class Server {
             throw new IllegalArgumentException("uuid cannot be null");
         }
 
+        Player player = this.players.get(uuid);
+        if (player == null) {
+            throw new IllegalArgumentException("this player does not exists");
+        }
+
+        LOGGER.debug("User " + player.getName() + " left the server");
+
         this.players.remove(uuid);
     }
 
-    // TODO: REMOVE
-    public void startRoomForStep1() {
+    public void addRoom(final Room room) {
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+
+        this.playersToRooms.put(room.getPlayerWhite().getUUID(), room);
+        this.playersToRooms.put(room.getPlayerBlack().getUUID(), room);
+    }
+
+    public void removeRoom(final Room room) {
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+
+        this.playersToRooms.remove(room.getPlayerWhite().getUUID());
+        this.playersToRooms.remove(room.getPlayerBlack().getUUID());
+    }
+
+    // TODO: remove
+    public void autoAddRoom() {
         Player p1 = null;
         Player p2 = null;
         int i = 0;
@@ -66,17 +96,13 @@ public class Server {
                 break;
             i++;
         }
-        this.room = new RoomForStep1(p1, p2);
+
+        this.addRoom(new Room(p1, p2));
     }
 
     // TODO: remove
-    public void endRoomForStep1() {
-        this.room = null;
-    }
-
-    // TODO: REMOVE
-    public RoomForStep1 getRoomForStep1() {
-        return this.room;
+    public void autoRemoveRoom() {
+        this.playersToRooms.clear();
     }
 
     public UUID getUUID() {
@@ -107,31 +133,42 @@ public class Server {
         return this.players.get(uuid);
     }
 
+    public List<Player> getPlayers() {
+        return new ArrayList<Player>(this.players.values());
+    }
+
+    public Room getPlayerRoom(final UUID playerUUID) {
+        return this.playersToRooms.get(playerUUID);
+    }
+
     public void loop() {
-        ListenerTCP listenerTCP = null;
-        ListenerUDP listenerUDP = null;
+        ServerRunner listenerTCP = null;
+        ServerRunner listenerUDP = null;
 
         try (ServerSocket socketTCP = new ServerSocket(port); DatagramSocket socketUDP = new DatagramSocket(port)) {
             listenerTCP = new ListenerTCP(this, socketTCP);
-            listenerTCP.start();
+            listenerUDP = new ListenerUDP(this, socketUDP);
+
+            Thread t1 = new Thread(listenerTCP);
+            t1.start();
 
             LOGGER.debug("Started TCP listener");
 
-            listenerUDP = new ListenerUDP(this, socketUDP);
-            listenerUDP.start();
+            Thread t2 = new Thread(listenerUDP);
+            t2.start();
 
             LOGGER.debug("Started UDP listener");
 
-            listenerTCP.join();
-            listenerUDP.join();
+            t1.join();
+            t2.join();
 
         } catch (InterruptedException e) {
             LOGGER.debug("Interrupting listeners...");
 
             if (listenerTCP != null)
-                listenerTCP.interrupt();
+                listenerTCP.requireStop();
             if (listenerUDP != null)
-                listenerUDP.interrupt();
+                listenerUDP.requireStop();
 
         } catch (IOException e) {
             LOGGER.fatal("Failed to create server listeners", e);
