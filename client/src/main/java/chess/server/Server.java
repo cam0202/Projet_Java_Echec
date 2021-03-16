@@ -36,6 +36,9 @@ public class Server {
         this.socketTCP = null;
         this.listenerTCP = null;
         this.clientUUID = null;
+
+        this.name = null;
+        this.description = null;
     }
 
     public boolean isConnected() {
@@ -47,16 +50,16 @@ public class Server {
             throw new IllegalStateException("cannot set callback function because not connected");
         }
 
-        assert(this.listenerTCP != null);
+        assert (this.listenerTCP != null);
         this.listenerTCP.setCallback(callback);
     }
 
     public String getName() {
-        return "TODO NAME";
+        return this.name;
     }
 
     public String getDescription() {
-        return "TODO DESCRIPTION";
+        return this.description;
     }
 
     public List<MessagePacket> discover() throws IOException {
@@ -148,6 +151,8 @@ public class Server {
         this.clientUUID = uuid;
         this.socketTCP = socketTCP;
         this.listenerTCP = listenerTCP;
+
+        this.updateServerInfo();
     }
 
     public void disconnect() throws IOException {
@@ -197,6 +202,33 @@ public class Server {
         Message response = this.listenerTCP.receive().getMessage();
         if (response.getType() != Message.Type.OK) {
             throw new IOException(response.getData());
+        }
+    }
+
+    private void updateServerInfo() throws IOException {
+        Message request = new Message(Message.Type.GET);
+        try {
+            JSONObject root = new JSONObject();
+            root.put("uuid", this.clientUUID.toString());
+            root.put("scope", "server");
+            request.setData(root.toString());
+        } catch (JSONException e) {
+            throw new IOException("failed to create request");
+        }
+
+        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
+
+        Message response = this.listenerTCP.receive().getMessage();
+        if (response.getType() != Message.Type.OK) {
+            throw new IOException(response.getData());
+        }
+
+        try {
+            JSONObject root = new JSONObject(response.getData());
+            this.name = root.getString("name");
+            this.description = root.getString("description");
+        } catch (JSONException e) {
+            throw new IOException("server response is ill-formed");
         }
     }
 }

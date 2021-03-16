@@ -85,6 +85,9 @@ class Processor {
         case Message.Type.DISCONNECT:
             return processDISCONNECT(request);
 
+        case Message.Type.GET:
+            return processGET(request);
+
         case Message.Type.POST:
             return processPOST(request);
 
@@ -187,7 +190,7 @@ class Processor {
         // TODO: REMOVE
         if (this.server.getOnlinePlayers() == 2) {
             LOGGER.debug("Game started");
-            //this.server.autoAddRoom();
+            // this.server.autoAddRoom();
         }
 
         return new MessagePacket(request, response);
@@ -236,11 +239,44 @@ class Processor {
 
         // TODO: REMOVE
         if (this.server.getOnlinePlayers() < 2) {
-            //this.server.autoRemoveRoom();
+            // this.server.autoRemoveRoom();
             LOGGER.debug("Game ended");
         }
 
         return new MessagePacket(request, new Message(Message.Type.OK));
+    }
+
+    private MessagePacket processGET(final MessagePacket request) {
+        if (request.getMessage().getData().length() <= 0) {
+            return new MessagePacket(request, this.error("payload is empty"));
+        }
+
+        UUID uuid = null;
+        JSONObject response = null;
+        try {
+            JSONObject root = new JSONObject(request.getMessage().getData());
+            uuid = this.decodeUUID(root);
+            switch (root.getString("scope")) {
+            case "server": {
+                response = new JSONObject().put("name", this.server.getName()).put("description",
+                        this.server.getDescription());
+                break;
+            }
+
+            default:
+                throw new JSONException("unknown scope");
+            }
+        } catch (JSONException e) {
+            return new MessagePacket(request, this.error("failed to decode payload: " + e.getMessage()));
+        }
+
+        assert (response != null);
+
+        Message r = new Message(Message.Type.OK);
+        r.setData(response.toString());
+
+        return new MessagePacket(request, r);
+
     }
 
     private MessagePacket processPOST(final MessagePacket request) {

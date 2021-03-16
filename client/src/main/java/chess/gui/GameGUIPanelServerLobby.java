@@ -3,7 +3,6 @@ package chess.gui;
 import java.io.IOException;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.Border;
 import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Component;
@@ -85,10 +84,6 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
         String text = String.format("[System] %s", message);
         p.setText(text);
         return p;
-    }
-
-    private Component makeOnlinePlayer(String playerName) {
-        return new Label(playerName);
     }
 
     private class InputTextBox extends TextBox {
