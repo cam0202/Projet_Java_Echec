@@ -1,5 +1,8 @@
 package chess.game;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import chess.game.chessman.Attack;
 import chess.game.chessman.Bishop;
 import chess.game.chessman.Chessman;
@@ -10,6 +13,7 @@ import chess.game.chessman.Queen;
 import chess.game.chessman.Rook;
 import chess.player.Player;
 
+
 /**
  * Class Board permet de réprésenter le jeux.
  *
@@ -17,8 +21,8 @@ import chess.player.Player;
 public class Board {
 	
 	// Joueurs
-	private final Player white;
-	private final Player black;
+	private Player white;
+	private Player black;
 	
 	// Tour
 	private Player whoIsNext;
@@ -36,12 +40,15 @@ public class Board {
     // Jeu
     private Square[][] board;
     
+
+    
     /**
      * Constructeur 
      * @param white
      * @param black
      */
     public Board(final Player white, Player black) {
+    	
     	// init joueur 
         this.white = white;
         this.black = black;
@@ -330,5 +337,100 @@ public class Board {
     		return "not execute move or attack !";
     	}
     }
+    
+    // Persitance
+    public String serialized() throws BoardException {
+    	
+    	 if (!this.whoIsNextAttack.equals(null)) {
+             throw new BoardException("You can't quit game when have an attack !");
+         }
+    	
+    	JSONObject root = new JSONObject();
+    	root.put("white", this.white.getName());
+    	root.put("black", this.black.getName());
+    	root.put("whoIsNext", this.whoIsNext.getName());
+    	root.put("score", this.score);
+    	
+    	// board 
+    	JSONArray board = new JSONArray();
+    	for (int letter = 0; letter < this.board.length; letter++) {
+    		JSONArray squareLine = new JSONArray();
+            for (int number = 0; number < this.board.length; number++) {
+                JSONObject square = new JSONObject();
+                if(this.board[letter][number].isTaken()) {
+                	Chessman c = this.board[letter][number].getChessman();
+                	if(c.getName().equals("Pawn") && c.getPlayer().equals(this.white)) {
+                		square.put("boolean", true);
+                	}
+                	if(c.getName().equals("Pawn") && c.getPlayer().equals(this.black)) {
+                		square.put("boolean", false);
+                	}
+                	square.put("chessman", c.getName());
+                	square.put("player", c.getPlayer().getName());
+                	squareLine.put(square);
+                } else {
+                	squareLine.put((JSONObject)null);
+                }
+            }
+            board.put(squareLine);
+        }
+    	
+    	root.put("board", board);   
+    	
+    	return root.toString();
+    	
+    } 
+    
+    public void deserialized(String game){
+    	
+    	JSONObject root = new JSONObject(game);
+    	
+    	// verification place des joueurs
+    	if(!this.white.getName().equals(root.getString("white"))) {
+    		Player role = this.white;
+    		this.white = this.black;
+    		this.black = role;
+    	}
+    	
+    	// remise du score
+    	for(int i = 0; i < root.getJSONArray("score").length(); i++) {
+    		this.score[i] = root.getJSONArray("score").getInt(i);
+    	}
+    	
+    	// tour du joueur 
+    	this.whoIsNext = root.get("whoIsNext").equals(this.white.getName()) ? this.white : this.black;
+
+    	// board
+    	JSONArray board = root.getJSONArray("board");
+    	
+    	for (int letter = 0; letter < board.length(); letter++) {
+    		JSONArray squareLine = board.getJSONArray(letter);
+            for (int number = 0; number < squareLine.length(); number++) {
+                JSONObject square = squareLine.getJSONObject(number);
+                if(this.board[letter][number].isTaken()) {
+                	Player p = root.get("player").equals(this.white.getName()) ? this.white : this.black;
+                	switch(square.getString("chessman")) {
+                	case "Pawn":
+                		this.board[letter][number].setChessman(new Pawn(p, square.getBoolean("boolean")));
+                	case "Bishop":
+                		this.board[letter][number].setChessman(new Bishop(p));
+                	case "King":
+                		this.board[letter][number].setChessman(new King(p));
+                	case "Knight":
+                		this.board[letter][number].setChessman(new Knight(p));
+                	case "Rook":
+                		this.board[letter][number].setChessman(new Rook(p));
+                	case "Queen":
+                		this.board[letter][number].setChessman(new Queen(p));
+                	}
+                } else {
+                	this.board[letter][number] = new Square(null);
+                }
+            }
+            board.put(squareLine);
+        }
+    	
+    }
+    
 }
 
