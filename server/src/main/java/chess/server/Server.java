@@ -82,29 +82,6 @@ public class Server {
         this.playersToRooms.remove(room.getPlayerBlack().getUUID());
     }
 
-    // TODO: remove
-    public void autoAddRoom() {
-        Player p1 = null;
-        Player p2 = null;
-        int i = 0;
-        for (Player p : this.players.values()) { // Get first two players
-            if (i == 0)
-                p1 = p;
-            else if (i == 1)
-                p2 = p;
-            else
-                break;
-            i++;
-        }
-
-        this.addRoom(new Room(p1, p2));
-    }
-
-    // TODO: remove
-    public void autoRemoveRoom() {
-        this.playersToRooms.clear();
-    }
-
     public UUID getUUID() {
         return this.uuid;
     }

@@ -50,7 +50,8 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
 
         this.top = new Panel();
         this.top.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        this.top.addComponent(this.pServerInfo.withBorder(Borders.singleLine(" Server info ")));
+        this.top.addComponent(this.pServerInfo
+                .withBorder(Borders.singleLine(" Connected as " + this.getGame().getServer().getUsername() + " ")));
         this.top.addComponent(this.pChat);
 
         this.bottom = new Panel();
@@ -63,13 +64,11 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
         this.addComponent(this.top);
         this.addComponent(new EmptySpace());
         this.addComponent(this.bottom);
-
-        this.getGame().getServer().setUpdateCallback(new UpdateCallback(this));
     }
 
     @Override
     public void update() {
-
+        this.getGame().getServer().setUpdateCallback(new UpdateCallback(this));
     }
 
     private Component makeChatPlayerItem(String playerName, String message) {
@@ -105,7 +104,7 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
                         this.setText("");
                     }
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    this.panel.pChat.addComponent(makeChatSystemItem("Error: " + e.getMessage()));
                 }
 
                 return Result.HANDLED;
@@ -118,7 +117,7 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
 
     private class ActionBackWrapper extends ActionBack {
 
-        public ActionBackWrapper(GameGUIPanel panel) {
+        public ActionBackWrapper(final GameGUIPanel panel) {
             super(panel);
         }
 
@@ -151,6 +150,10 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
                     processCHAT(root);
                     break;
 
+                case "state":
+                    processSTATE(root);
+                    break;
+
                 default:
                     // TODO
                     break;
@@ -164,7 +167,8 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
             switch (root.getString("action")) {
             case "player_chat": {
                 JSONObject dataRoot = root.getJSONObject("data");
-                this.panel.pChat.addComponent(makeChatPlayerItem(dataRoot.getString("username"), dataRoot.getString("message")));
+                this.panel.pChat.addComponent(
+                        makeChatPlayerItem(dataRoot.getString("username"), dataRoot.getString("message")));
                 break;
             }
 
@@ -183,6 +187,18 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
             default:
                 throw new JSONException("unknown action");
             }
+        }
+
+        private void processSTATE(final JSONObject root) throws JSONException {
+            switch (root.getString("action")) {
+            case "switch_to_room": {
+                this.panel.getGame().getServer().setUpdateCallback(null);
+                this.panel.getGame().switchPanel(new GameGUIPanelServerRoom(this.panel.getGame(), this.panel));
+                break;
+            }
+            }
+
+            // TODO
         }
 
     }

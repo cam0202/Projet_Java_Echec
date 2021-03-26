@@ -56,18 +56,10 @@ public class GameGUI extends Game {
 
                 MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
                 gui.addWindow(this.window);
-
-                GameGUIPanel panel = new GameGUIPanelHome(this);
-                Thread t = new Thread(new Runnable(){
-                    @Override
-                    public void run() {
-                        panel.update();
-                    }
-                });
-                t.start();
                 
                 this.window.setCloseWindowWithEscape(true); // TODO: temporary
-                this.window.setComponent(panel);
+                
+                this.switchPanel(new GameGUIPanelHome(this));
 
                 // TODO: SIGINT seems to not be handled correctly here...
                 gui.waitForWindowToClose(this.window);

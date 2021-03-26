@@ -32,6 +32,8 @@ public class Server {
     private String name;
     private String description;
 
+    private String username;
+
     public Server() {
         this.socketTCP = null;
         this.listenerTCP = null;
@@ -60,6 +62,10 @@ public class Server {
 
     public String getDescription() {
         return this.description;
+    }
+
+    public String getUsername() {
+        return this.username;
     }
 
     public List<MessagePacket> discover() throws IOException {
@@ -118,11 +124,12 @@ public class Server {
         }
 
         Socket socketTCP = new Socket(address, port);
+        String username = "User-" + socketTCP.getLocalPort();
 
         Message request = new Message(Message.Type.CONNECT);
         try {
             JSONObject root = new JSONObject();
-            root.put("name", "User-" + socketTCP.getLocalPort());
+            root.put("name", username);
             request.setData(root.toString());
         } catch (JSONException e) {
             throw new IOException("failed to create request");
@@ -152,6 +159,8 @@ public class Server {
         this.socketTCP = socketTCP;
         this.listenerTCP = listenerTCP;
 
+        this.username = username;
+
         this.updateServerInfo();
     }
 
@@ -180,6 +189,7 @@ public class Server {
         this.clientUUID = null;
         this.socketTCP = null;
         this.listenerTCP = null;
+        this.username = null;
     }
 
     public void post(String message) throws IOException {

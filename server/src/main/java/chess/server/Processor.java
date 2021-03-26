@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -187,12 +188,6 @@ class Processor {
         } catch (IOException ignore) {
         }
 
-        // TODO: REMOVE
-        if (this.server.getOnlinePlayers() == 2) {
-            LOGGER.debug("Game started");
-            // this.server.autoAddRoom();
-        }
-
         return new MessagePacket(request, response);
     }
 
@@ -235,12 +230,6 @@ class Processor {
                 }
             }
         } catch (IOException ignore) {
-        }
-
-        // TODO: REMOVE
-        if (this.server.getOnlinePlayers() < 2) {
-            // this.server.autoRemoveRoom();
-            LOGGER.debug("Game ended");
         }
 
         return new MessagePacket(request, new Message(Message.Type.OK));
@@ -301,6 +290,70 @@ class Processor {
         }
 
         if (payload.startsWith("/")) {
+            String[] args = payload.substring(1).split(" ");
+            switch (args[0]) {
+            case "start": {
+                if (args.length != 2)
+                    return new MessagePacket(request, this.error("missing other player"));
+
+                if (player.getName().equals(args[1]))
+                    return new MessagePacket(request, this.error("cannot start a game with yourself"));
+
+                Player other = null;
+                for (Player p : this.server.getPlayers()) {
+                    if (p.getName().equals(args[1])) {
+                        other = p;
+                    }
+                }
+
+                if (other == null)
+                    return new MessagePacket(request, this.error("other player not found"));
+
+                Room room = new Room(player, other);
+                this.server.addRoom(room);
+
+                JSONObject root = new JSONObject();
+                root.put("scope", "state");
+                root.put("action", "switch_to_room");
+
+                Message msg = new Message(Message.Type.PUSH);
+                msg.setData(root.toString());
+
+                try {
+                    MessageTCP.send(player.getSocket(), new MessagePacket(player.getSocket(), msg));
+                    MessageTCP.send(other.getSocket(), new MessagePacket(other.getSocket(), msg));
+                } catch (IOException e) {
+                    return new MessagePacket(request, error("failed to send message to one or more peers"));
+                }
+                break;
+            }
+
+            case "stop": {
+                Room room = this.server.getPlayerRoom(player.getUUID());
+                if (room == null)
+                    return new MessagePacket(request, error("game is not started"));
+
+                this.server.removeRoom(room);
+
+                JSONObject root = new JSONObject();
+                root.put("scope", "state");
+                root.put("action", "switch_to_lobby");
+
+                Message msg = new Message(Message.Type.PUSH);
+                msg.setData(root.toString());
+
+                Player other = room.getPlayerWhite().equals(player) ? room.getPlayerBlack() : room.getPlayerWhite();
+                try {
+                    MessageTCP.send(player.getSocket(), new MessagePacket(player.getSocket(), msg));
+                    MessageTCP.send(other.getSocket(), new MessagePacket(other.getSocket(), msg));
+                } catch (IOException e) {
+                    return new MessagePacket(request, error("failed to send message to one or more peers"));
+                }
+
+                break;
+            }
+            }
+
             // This is a command to execute
             // TODO
         } else {
@@ -328,39 +381,5 @@ class Processor {
         }
 
         return new MessagePacket(request, new Message(Message.Type.OK));
-    }
-
-    private MessagePacket processPLAY(final MessagePacket request) {
-        if (request.getMessage().getData().length() <= 0) {
-            return new MessagePacket(request, this.error("payload is empty"));
-        }
-
-        UUID uuid = null;
-        String command = null;
-        try {
-            JSONObject root = new JSONObject(request.getMessage().getData());
-            uuid = this.decodeUUID(root);
-            command = root.getString("command");
-        } catch (JSONException e) {
-            return new MessagePacket(request, this.error("failed to decode payload: " + e.getMessage()));
-        }
-
-        Player player = this.server.getPlayer(uuid);
-
-        if (player == null) {
-            return new MessagePacket(request, this.error("not connected"));
-        }
-
-        Room room = this.server.getPlayerRoom(uuid);
-        if (room == null) {
-            return new MessagePacket(request, this.error("you are not in a game room"));
-        }
-        try {
-            Message msg = new Message(Message.Type.OK);
-            msg.setData(room.play(player, command));
-            return new MessagePacket(request, msg);
-        } catch (BoardException e) {
-            return new MessagePacket(request, this.error(e.getMessage()));
-        }
     }
 }
