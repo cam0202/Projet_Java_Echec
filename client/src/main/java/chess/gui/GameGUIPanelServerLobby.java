@@ -25,9 +25,6 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
 
     private static final Logger LOGGER = Logger.getLogger(GameGUIPanelServerLobby.class);
 
-    private final Panel top;
-    private final Panel bottom;
-
     private final Panel pServerInfo;
     private final Panel pChat;
 
@@ -48,22 +45,24 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
 
         this.cInput = new InputTextBox(this);
 
-        this.top = new Panel();
-        this.top.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        this.top.addComponent(this.pServerInfo
+        Panel top = new Panel();
+        top.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        top.addComponent(this.pServerInfo
                 .withBorder(Borders.singleLine(" Connected as " + this.getGame().getServer().getUsername() + " ")));
-        this.top.addComponent(this.pChat);
+        top.addComponent(this.pChat);
 
-        this.bottom = new Panel();
-        this.bottom.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        this.bottom.addComponent(this.cInput.withBorder(Borders.singleLine("Your input")));
+        Panel bottom = new Panel();
+        bottom.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        bottom.addComponent(this.cInput.withBorder(Borders.singleLine(" Your input ")));
 
         this.setLayoutManager(new LinearLayout(Direction.VERTICAL));
         this.addComponent(new Button("Quit server", new ActionBackWrapper(this)));
         this.addComponent(new EmptySpace());
-        this.addComponent(this.top);
+        this.addComponent(top);
         this.addComponent(new EmptySpace());
-        this.addComponent(this.bottom);
+        this.addComponent(bottom);
+
+        this.pChat.addComponent(makeChatSystemItem("Welcome to the server! Use the /start command to play."));
     }
 
     @Override
@@ -72,17 +71,11 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
     }
 
     private Component makeChatPlayerItem(String playerName, String message) {
-        Label p = new Label("");
-        String text = String.format("<%s> %s", playerName, message);
-        p.setText(text);
-        return p;
+        return new Label(String.format("<%s> %s", playerName, message));
     }
 
     private Component makeChatSystemItem(String message) {
-        Label p = new Label("");
-        String text = String.format("[System] %s", message);
-        p.setText(text);
-        return p;
+        return new Label(String.format(">>> %s", message));
     }
 
     private class InputTextBox extends TextBox {

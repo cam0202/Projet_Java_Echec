@@ -1,8 +1,11 @@
 package chess.gui;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.TextGUIThread;
+import com.googlecode.lanterna.gui2.WindowListener;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -14,7 +17,7 @@ import chess.game.Game;
 import chess.server.Server;
 
 public class GameGUI extends Game {
-    
+
     private static final Logger LOGGER = Logger.getLogger(GameGUI.class);
 
     private final DefaultTerminalFactory factory;
@@ -22,20 +25,22 @@ public class GameGUI extends Game {
 
     private final Server server;
 
+    private GameGUIPanel currentPanel;
+
     public GameGUI() throws IOException {
         this.factory = new DefaultTerminalFactory();
         this.factory.setPreferTerminalEmulator(false);
         this.window = new GameGUIWindow();
 
         this.server = new Server();
+
+        this.currentPanel = null;
     }
 
     public void switchPanel(final GameGUIPanel newPanel) {
-        if (newPanel != null) {
-            newPanel.update();
-        }
-        
-        this.window.setComponent(newPanel);
+        this.currentPanel = newPanel;
+        this.currentPanel.setRequireUpdate(true);
+        this.window.setComponent(this.currentPanel);
     }
 
     public GameGUIWindow getWindow() {
@@ -56,13 +61,37 @@ public class GameGUI extends Game {
 
                 MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
                 gui.addWindow(this.window);
-                
+
                 this.window.setCloseWindowWithEscape(true); // TODO: temporary
-                
+
                 this.switchPanel(new GameGUIPanelHome(this));
 
-                // TODO: SIGINT seems to not be handled correctly here...
-                gui.waitForWindowToClose(this.window);
+                while (this.window.getTextGUI() != null) {
+                    if (this.currentPanel != null && this.currentPanel.getRequireUpdate()) {
+                        this.currentPanel.update();
+                        this.currentPanel.setRequireUpdate(false);
+                    }
+
+                    boolean sleep = true;
+                    TextGUIThread guiThread = gui.getGUIThread();
+                    if (Thread.currentThread() == guiThread.getThread()) {
+                        try {
+                            sleep = !guiThread.processEventsAndUpdate();
+                        } catch (EOFException ignore) {
+                            // The GUI has closed so allow exit
+                            break;
+                        } catch (IOException e) {
+                            throw new RuntimeException("Unexpected IOException while waiting for window to close", e);
+                        }
+                    }
+
+                    if (sleep) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException ignore) {
+                        }
+                    }
+                }
 
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());

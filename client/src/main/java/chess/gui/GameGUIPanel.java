@@ -7,6 +7,8 @@ public abstract class GameGUIPanel extends Panel {
     private final GameGUI game;
     private final GameGUIPanel previous;
 
+    private boolean requireUpdate;
+
     public GameGUIPanel(final GameGUI game) {
         this(game, null);
     }
@@ -18,10 +20,20 @@ public abstract class GameGUIPanel extends Panel {
 
         this.game = game;
         this.previous = previous;
+
+        this.requireUpdate = true;
     }
 
     protected GameGUI getGame() {
         return this.game;
+    }
+
+    public void setRequireUpdate(boolean value) {
+        this.requireUpdate = value;
+    }
+
+    public boolean getRequireUpdate() {
+        return this.requireUpdate;
     }
 
     public abstract void update();

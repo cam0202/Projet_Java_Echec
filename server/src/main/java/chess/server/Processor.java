@@ -252,6 +252,12 @@ class Processor {
                 break;
             }
 
+            case "room": {
+                Room room = this.server.getPlayerRoom(uuid);
+                response = room.getState();
+                break;
+            }
+
             default:
                 throw new JSONException("unknown scope");
             }
@@ -309,6 +315,10 @@ class Processor {
                 if (other == null)
                     return new MessagePacket(request, this.error("other player not found"));
 
+                if (this.server.getPlayerRoom(uuid) != null) {
+                    return new MessagePacket(request, this.error("you are already in a game room"));
+                }
+
                 Room room = new Room(player, other);
                 this.server.addRoom(room);
 
@@ -330,8 +340,9 @@ class Processor {
 
             case "stop": {
                 Room room = this.server.getPlayerRoom(player.getUUID());
-                if (room == null)
+                if (room == null) {
                     return new MessagePacket(request, error("game is not started"));
+                }
 
                 this.server.removeRoom(room);
 
@@ -347,10 +358,40 @@ class Processor {
                     MessageTCP.send(player.getSocket(), new MessagePacket(player.getSocket(), msg));
                     MessageTCP.send(other.getSocket(), new MessagePacket(other.getSocket(), msg));
                 } catch (IOException e) {
-                    return new MessagePacket(request, error("failed to send message to one or more peers"));
+                    return new MessagePacket(request, this.error("failed to send message to one or more peers"));
                 }
 
                 break;
+            }
+
+            case "play": {
+                Room room = this.server.getPlayerRoom(player.getUUID());
+                if (room == null) {
+                    return new MessagePacket(request, error("your are not in a game room"));
+                }
+
+                if (args.length != 2)
+                    return new MessagePacket(request, this.error("missing command"));
+
+                try {
+                    JSONObject root = new JSONObject();
+                    root.put("scope", "chat");
+                    root.put("action", "play");
+                    root.put("data", new JSONObject().put("message", room.play(player, args[1])));
+
+                    Message msg = new Message(Message.Type.PUSH);
+                    msg.setData(root.toString());
+
+                    Player other = room.getPlayerWhite().equals(player) ? room.getPlayerBlack() : room.getPlayerWhite();
+                    MessageTCP.send(player.getSocket(), new MessagePacket(player.getSocket(), msg));
+                    MessageTCP.send(other.getSocket(), new MessagePacket(other.getSocket(), msg));
+
+                } catch (BoardException e) {
+                    return new MessagePacket(request, this.error(e.getMessage()));
+                } catch (IOException e) {
+                    return new MessagePacket(request, this.error("failed to send message to one or more peers"));
+                }
+
             }
             }
 
@@ -368,12 +409,22 @@ class Processor {
 
             // This is a chat message
             try {
-                for (Player p : this.server.getPlayers()) {
-                    if (this.server.getPlayerRoom(p.getUUID()) == null) {
-                        Message msg = new Message(Message.Type.PUSH);
-                        msg.setData(root.toString());
+                Message msg = new Message(Message.Type.PUSH);
+                msg.setData(root.toString());
+
+                Room room = this.server.getPlayerRoom(player.getUUID());
+
+                // If the player is in a room, sent the message to players in the room,
+                // otherwise send it in the global chat
+                if (room == null) {
+                    for (Player p : this.server.getPlayers()) {
                         MessageTCP.send(p.getSocket(), new MessagePacket(p.getSocket(), msg));
                     }
+                } else {
+                    Player white = room.getPlayerWhite();
+                    Player black = room.getPlayerBlack();
+                    MessageTCP.send(white.getSocket(), new MessagePacket(white.getSocket(), msg));
+                    MessageTCP.send(black.getSocket(), new MessagePacket(black.getSocket(), msg));
                 }
             } catch (IOException e) {
                 return new MessagePacket(request, error("failed to send message to one or more peers"));

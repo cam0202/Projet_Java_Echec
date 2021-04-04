@@ -1,6 +1,7 @@
 package chess.server;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import chess.game.Board;
 import chess.game.BoardException;
@@ -31,10 +32,6 @@ public class Room {
         this.board = new Board(this.white, this.black);
     }
 
-    public Board getBoard() {
-        return this.board;
-    }
-
     public Player getPlayerWhite() {
         return this.white;
     }
@@ -59,6 +56,13 @@ public class Room {
         } else {
             throw new IllegalArgumentException("player is not in this room");
         }
+    }
+
+    public JSONObject getState() {
+        JSONObject root = new JSONObject();
+        root.put("number", 9999); // TODO
+        root.put("board", this.board.serialize());
+        return root;
     }
 
     public String play(final Player player, final String command) throws BoardException {

@@ -192,6 +192,31 @@ public class Server {
         this.username = null;
     }
 
+    public String get(String scope) throws IOException {
+        if (scope == null) {
+            throw new IllegalArgumentException("scope is null");
+        }
+
+        Message request = new Message(Message.Type.GET);
+        try {
+            JSONObject root = new JSONObject();
+            root.put("uuid", this.clientUUID.toString());
+            root.put("scope", scope);
+            request.setData(root.toString());
+        } catch (JSONException e) {
+            throw new IOException("failed to create request");
+        }
+
+        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
+
+        Message response = this.listenerTCP.receive().getMessage();
+        if (response.getType() != Message.Type.OK) {
+            throw new IOException(response.getData());
+        }
+        
+        return response.getData();
+    }
+
     public void post(String message) throws IOException {
         if (message == null) {
             throw new IllegalArgumentException("message is null");
@@ -216,25 +241,10 @@ public class Server {
     }
 
     private void updateServerInfo() throws IOException {
-        Message request = new Message(Message.Type.GET);
-        try {
-            JSONObject root = new JSONObject();
-            root.put("uuid", this.clientUUID.toString());
-            root.put("scope", "server");
-            request.setData(root.toString());
-        } catch (JSONException e) {
-            throw new IOException("failed to create request");
-        }
-
-        MessageTCP.send(this.socketTCP, new MessagePacket(this.socketTCP, request));
-
-        Message response = this.listenerTCP.receive().getMessage();
-        if (response.getType() != Message.Type.OK) {
-            throw new IOException(response.getData());
-        }
+        String data = this.get("server");
 
         try {
-            JSONObject root = new JSONObject(response.getData());
+            JSONObject root = new JSONObject(data);
             this.name = root.getString("name");
             this.description = root.getString("description");
         } catch (JSONException e) {
