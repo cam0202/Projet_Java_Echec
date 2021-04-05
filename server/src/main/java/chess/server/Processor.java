@@ -1,8 +1,16 @@
 package chess.server;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -361,6 +369,137 @@ class Processor {
                 }
 
                 break;
+            }
+
+            case "save": {
+                Room room = this.server.getPlayerRoom(player.getUUID());
+                if (room == null) {
+                    return new MessagePacket(request, error("game is not started"));
+                }
+
+                // Trigger going back to lobby, then save
+                JSONObject root = new JSONObject(request.getMessage().getData());
+                root.put("payload", "/stop");
+                request.getMessage().setData(root.toString());
+                this.processPOST(request);
+
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // Yes, this is a hack to make sure the GUI is ready
+                            // I don't have time to redo half of the GUI system
+                            // and this was flawed from the beginning
+                            Thread.sleep(200);
+
+                            JSONObject root = new JSONObject();
+                            root.put("scope", "chat");
+                            root.put("action", "system_info");
+
+                            try {
+                                File file = File.createTempFile("chessroom-", ".json");
+
+                                try (FileWriter writer = new FileWriter(file)) {
+                                    writer.write(room.getState().toString(2));
+                                }
+
+                                // Extract room ID
+                                Pattern pattern = Pattern.compile("chessroom-(.*?).json");
+                                Matcher matcher = pattern.matcher(file.getName());
+                                if (matcher.find()) {
+                                    root.put("data", new JSONObject().put("message",
+                                            "Your room has been saved! Use /restore " + matcher.group(1)));
+                                }
+
+                            } catch (IOException e) {
+                                root.put("data", new JSONObject().put("message", "Failed to save your room, sorry"));
+                            }
+
+                            Message msg = new Message(Message.Type.PUSH);
+                            msg.setData(root.toString());
+
+                            Player other = room.getPlayerWhite().equals(player) ? room.getPlayerBlack()
+                                    : room.getPlayerWhite();
+                            try {
+                                MessageTCP.send(player.getSocket(), new MessagePacket(player.getSocket(), msg));
+                                MessageTCP.send(other.getSocket(), new MessagePacket(other.getSocket(), msg));
+                            } catch (IOException ignore) {
+                            }
+
+                        } catch (InterruptedException ignore) {
+                        }
+                    }
+                });
+
+                t.setDaemon(true); // No cleanup
+                t.start();
+                break;
+            }
+
+            case "restore": {
+                if (this.server.getPlayerRoom(uuid) != null) {
+                    return new MessagePacket(request, this.error("you are already in a game room"));
+                }
+
+                if (args.length != 2)
+                    return new MessagePacket(request, this.error("missing room identifier"));
+
+                File file = new File(System.getProperty("java.io.tmpdir"), "chessroom-" + args[1] + ".json");
+                if (!file.exists())
+                    return new MessagePacket(request, this.error("unknown room identifier"));
+
+                try {
+                    JSONObject root = null;
+                    try (FileInputStream stream = new FileInputStream(file)) {
+                        byte[] data = new byte[(int) file.length()];
+                        stream.read(data);
+                        root = new JSONObject(new String(data));
+                    } catch (IOException e) {
+                        return new MessagePacket(request, this.error("could not retrieve save data"));
+                    }
+
+                    JSONObject rootBoard = new JSONObject(root.getString("board"));
+
+                    Player white = null;
+                    Player black = null;
+                    for (Player p : this.server.getPlayers()) {
+                        if (white == null && p.getName().equals(rootBoard.getString("white"))) {
+                            white = p;
+                        }
+
+                        if (black == null && p.getName().equals(rootBoard.getString("black"))) {
+                            black = p;
+                        }
+
+                        if (white != null && black != null)
+                            break;
+                    }
+
+                    if (white == null || black == null) {
+                        return new MessagePacket(request, this.error("one or more player is missing, cannot start"));
+                    }
+
+                    Room room = new Room(white, black, root.getString("board"));
+                    this.server.addRoom(room);
+
+                    root = new JSONObject();
+                    root.put("scope", "state");
+                    root.put("action", "switch_to_room");
+
+                    Message msg = new Message(Message.Type.PUSH);
+                    msg.setData(root.toString());
+
+                    try {
+                        MessageTCP.send(white.getSocket(), new MessagePacket(white.getSocket(), msg));
+                        MessageTCP.send(black.getSocket(), new MessagePacket(black.getSocket(), msg));
+                    } catch (IOException e) {
+                        return new MessagePacket(request, error("failed to send message to one or more peers"));
+                    }
+                    break;
+
+                } catch (JSONException e) {
+                    return new MessagePacket(request, this.error("save data is corrupted"));
+                }
             }
 
             case "play": {

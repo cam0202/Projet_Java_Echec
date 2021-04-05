@@ -177,6 +177,12 @@ public class GameGUIPanelServerLobby extends GameGUIPanel {
                 break;
             }
 
+            case "system_info" : {
+                JSONObject dataRoot = root.getJSONObject("data");
+                this.panel.pChat.addComponent(makeChatSystemItem(dataRoot.getString("message")));
+                break;
+            }
+
             default:
                 throw new JSONException("unknown action");
             }

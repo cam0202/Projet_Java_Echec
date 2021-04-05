@@ -361,10 +361,10 @@ public class Board {
                 JSONObject square = new JSONObject();
                 if (this.board[letter][number].isTaken()) {
                     Chessman c = this.board[letter][number].getChessman();
-                    if (c.getName().equals("Pawn") && c.getPlayer().equals(this.white)) {
+                    if (c.getName().equals("pawn") && c.getPlayer().equals(this.white)) {
                         square.put("boolean", true);
                     }
-                    if (c.getName().equals("Pawn") && c.getPlayer().equals(this.black)) {
+                    if (c.getName().equals("pawn") && c.getPlayer().equals(this.black)) {
                         square.put("boolean", false);
                     }
                     square.put("chessman", c.getName());
@@ -378,8 +378,6 @@ public class Board {
         }
 
         root.put("board", board);
-
-        LOGGER.debug(root.toString(2));
 
         return root.toString();
 
@@ -410,9 +408,9 @@ public class Board {
         for (int letter = 0; letter < board.length(); letter++) {
             JSONArray squareLine = board.getJSONArray(letter);
             for (int number = 0; number < squareLine.length(); number++) {
-                JSONObject square = squareLine.getJSONObject(number);
-                if (this.board[letter][number].isTaken()) {
-                    Player p = root.get("player").equals(this.white.getName()) ? this.white : this.black;
+                JSONObject square = squareLine.optJSONObject(number);
+                if (square != null) {
+                    Player p = square.getString("player").equals(this.white.getName()) ? this.white : this.black;
                     switch (square.getString("chessman")) {
                     case "pawn":
                         this.board[letter][number].setChessman(new Pawn(p, square.getBoolean("boolean")));
@@ -437,7 +435,6 @@ public class Board {
                     this.board[letter][number] = new Square(null);
                 }
             }
-            board.put(squareLine);
         }
 
     }

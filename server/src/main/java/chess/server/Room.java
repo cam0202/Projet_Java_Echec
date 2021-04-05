@@ -18,6 +18,10 @@ public class Room {
     private final Board board;
 
     public Room(final Player white, final Player black) {
+        this(white, black, null);
+    }
+
+    public Room(final Player white, final Player black, final String boardSerialized) {
         if (white == null) {
             throw new IllegalArgumentException("player white is null");
         }
@@ -30,6 +34,9 @@ public class Room {
         this.black = black;
 
         this.board = new Board(this.white, this.black);
+        if (boardSerialized != null) {
+            this.board.deserialize(boardSerialized);
+        }
     }
 
     public Player getPlayerWhite() {
