@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

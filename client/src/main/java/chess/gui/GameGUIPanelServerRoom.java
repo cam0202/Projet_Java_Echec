@@ -58,7 +58,8 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
 
         Panel top = new Panel();
         top.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        top.addComponent(topLeft.withBorder(Borders.singleLine(" " + this.getGame().getServer().getName() + " ")));
+        top.addComponent(topLeft.withBorder(Borders.singleLine(String.format(" %s (%s) ",
+                this.getGame().getServer().getName(), this.getGame().getServer().getUsername()))));
         top.addComponent(pChat);
 
         Panel bottom = new Panel();
@@ -85,20 +86,25 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
             this.pRoomInfo.removeAllComponents();
 
             JSONObject root = new JSONObject(this.getGame().getServer().get("room"));
-            this.pRoomInfo.addComponent(new Label("Playing in room #" + root.getInt("number")));
+            int roomNum = root.getInt("number");
 
             root = new JSONObject(root.getString("board"));
-            TextColor ourColor = root.getString("white").equals(this.getGame().getServer().getUsername())
-                    ? TextColor.ANSI.WHITE
-                    : TextColor.ANSI.BLACK;
-            TextColor otherColor = root.getString("black").equals(this.getGame().getServer().getUsername())
-                    ? TextColor.ANSI.WHITE
-                    : TextColor.ANSI.BLACK;
-            this.pRoomInfo
-                    .addComponent(new Label("You are " + (ourColor.equals(TextColor.ANSI.WHITE) ? "white" : "black")));
-            this.pRoomInfo.addComponent(new Label("It's "
-                    + (root.getString("whoIsNext").equals(this.getGame().getServer().getUsername()) ? "your turn"
-                            : "not your turn")));
+            String whiteUsername = root.getString("white");
+            String blackUsername = root.getString("black");
+            String whoIsNextUsername = root.getString("whoIsNext");
+
+            String ourUsername = this.getGame().getServer().getUsername();
+
+            TextColor ourColor = whiteUsername.equals(ourUsername) ? TextColor.ANSI.WHITE : TextColor.ANSI.BLACK;
+            TextColor otherColor = blackUsername.equals(ourUsername) ? TextColor.ANSI.WHITE : TextColor.ANSI.BLACK;
+
+            this.pRoomInfo.addComponent(new Label(String.format("Playing in room #%d against %s", roomNum,
+                    ourUsername.equals(whiteUsername) ? blackUsername : whiteUsername)));
+
+            this.pRoomInfo.addComponent(
+                    new Label(String.format("You are %s", ourColor.equals(TextColor.ANSI.WHITE) ? "white" : "black")));
+            this.pRoomInfo.addComponent(new Label(
+                    String.format("It's %s", whoIsNextUsername.equals(ourUsername) ? "your turn" : "not your turn")));
 
             // Update whole board
             this.pBoard.removeAllComponents();
@@ -111,7 +117,8 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
 
                 for (int letter = 0; letter < 8; letter++) {
                     JSONObject chessman = arr.getJSONArray(letter).optJSONObject(number);
-                    TextColor bg = (letter + number) % 2 == 0 ? TextColor.ANSI.YELLOW_BRIGHT : TextColor.ANSI.GREEN_BRIGHT;
+                    TextColor bg = (letter + number) % 2 == 0 ? TextColor.ANSI.YELLOW_BRIGHT
+                            : TextColor.ANSI.GREEN_BRIGHT;
 
                     if (chessman != null) {
                         TextColor fg = chessman.getString("player").equals(this.getGame().getServer().getUsername())
