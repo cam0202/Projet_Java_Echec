@@ -52,6 +52,7 @@ public class BoardTest {
 		Move m2 = new Move('d','2','d','4');
 		Move m3 = new Move('c','6','d','4');
 		Move m4 = new Move('a','2','a','3');
+		Move m5 = new Move('e','2','e','3');
 		
 		
 		assertTrue(this.board.play(this.player1,m2, null).contains("moved"));
@@ -59,26 +60,26 @@ public class BoardTest {
 		assertTrue(this.board.play(this.player1,m4, null).contains("moved"));
 		assertTrue(this.board.play(this.player2,m3, null).contains("fight"));
 		
-		/*
-		boolean t = true;
-		while(t) {
-			if(this.board.getC1attack().getLive() > 0 && this.board.getC2attack().getLive() > 0 ) {
-				assertTrue(this.board.play(this.player2,null, "Torch").contains("impact"));
-				assertTrue(this.board.play(this.player1,null, "Hellos").contains("impact"));
-			} else if (this.board.getC1attack().getLive() <= 0 || this.board.getC2attack().getLive() <= 0 ){
-				t = false;
-			}
+		
+		
+		
+	
+		try {
+			assertTrue(this.board.play(this.player2,null, "Torch").contains("impact"));
+			assertTrue(this.board.play(this.player1,null, "Hellos").contains("impact"));
+			assertTrue(this.board.play(this.player2,null, "Torch").contains("impact"));
+			assertTrue(this.board.play(this.player1,null, "Hellos").contains("impact"));
+			assertTrue(this.board.play(this.player2,null, "Torch").contains("impact"));
+			assertTrue(this.board.play(this.player1,null, "Hellos").contains("impact"));
+			assertTrue(this.board.play(this.player2,null, "Torch").contains("impact"));
+			assertTrue(this.board.play(this.player1,null, "Hellos").contains("impact"));
+		} catch(Exception e) {
+			assertTrue(this.board.play(this.player1, m5, null).contains("moved"));
+			if(this.board.getC1attack().getLive() <= 0){
+				assertEquals(this.board.getBoard()[3][3].getChessman(), this.board.getC2attack());
+			} else {
+				assertEquals(this.board.getBoard()[3][3].getChessman(), this.board.getC1attack());
+			}		
 		}
-		
-		assertTrue(this.board.play(this.player1, m4, null).contains("moved"));
-		
-		if(this.board.getC1attack().getLive() <= 0){
-			assertEquals(this.board.getBoard()[3][3].getChessman(), this.board.getC2attack());
-		} else {
-			assertEquals(this.board.getBoard()[3][3].getChessman(), this.board.getC2attack());
-		}
-		
-		*/
-		
 	}
 }
