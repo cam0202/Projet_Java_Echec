@@ -83,14 +83,17 @@ public class Room {
 
         String cmd = command.toLowerCase();
         if (cmd.length() == 4) {
-            // This is a MOVE command
+            // This may be a MOVE command
             char[] data = cmd.toCharArray();
-            Move move = new Move(data[0], data[1], data[2], data[3]);
-            return this.board.play(player, move, null);
-        } else {
-            // This is an ATTACK command
-            return this.board.play(player, null, cmd);
+            if (Character.isDigit(data[1]) && Character.isDigit(data[3])) {
+                // This is a MOVE command
+                Move move = new Move(data[0], data[1], data[2], data[3]);
+                return this.board.play(player, move, null);
+            }
         }
+
+        // This is an ATTACK command
+        return this.board.play(player, null, cmd);
     }
 
 }

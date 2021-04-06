@@ -16,6 +16,8 @@ The default port for the server is UDP port `12345`.
 ## Status messages
 - `OK(200)`: Generic success response. This is always sent by the server and will contain any data appropriate
 
+- `KO(400)`: Generic error response.
+
 ## Connection-less messages
 - `DISCOVER(100)`: Usually sent to the broadcast address (on the default port). Allows discovery of servers on the local network.
     - A client's payload will be empty.
@@ -39,12 +41,21 @@ The default port for the server is UDP port `12345`.
         - `uuid`: a string representing the client's unique identifier
     - A server's payload will be empty.
 
-- `MOVE(302)`: Request to move a board piece from one location to another
+- `GET(310)`: Request to get a piece of information from the server
     - A client's payload will contain the following mandatory fields:
         - `uuid`: a string representing the client's uuid
-        - `command`: a string containing the move command to execute on the server
+        - `scope`: a string representing the information requested
+    - A server's response will contain the information requested
+
+- `POST(311)`: Request to make the server take an action (add message to chat, move a piece, ...)
+    - A client's payload will contain the following mandatory fields:
+        - `uuid`: a string representing the client's uuid
+        - `payload`: a string containing the command to execute on the server
     - A server's payload will be empty
 
-- `PUSH(303)`: Notification message sent by the server
-    - The payload is context dependent
+- `PUSH(320)`: Notification message sent by the server
+    - A server's payload will contain the following mandatory fields:
+        - `scope`: The context in which the notification takes place
+        - `action`: The action that should be executed my the client
+        - `data`: A JSON encoded string containing additional information depending on the scope and action
 
