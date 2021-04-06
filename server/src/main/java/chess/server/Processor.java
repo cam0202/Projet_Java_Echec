@@ -495,11 +495,12 @@ class Processor {
                     } catch (IOException e) {
                         return new MessagePacket(request, error("failed to send message to one or more peers"));
                     }
-                    break;
 
                 } catch (JSONException e) {
                     return new MessagePacket(request, this.error("save data is corrupted"));
                 }
+
+                break;
             }
 
             case "play": {
@@ -530,6 +531,11 @@ class Processor {
                     return new MessagePacket(request, this.error("failed to send message to one or more peers"));
                 }
 
+                break;
+            }
+
+            default: {
+                return new MessagePacket(request, this.error("unknown command " + args[0]));
             }
             }
 

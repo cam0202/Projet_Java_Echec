@@ -117,7 +117,7 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
 
                 for (int letter = 0; letter < 8; letter++) {
                     JSONObject chessman = arr.getJSONArray(letter).optJSONObject(number);
-                    TextColor bg = (letter + number) % 2 == 0 ? TextColor.ANSI.YELLOW_BRIGHT
+                    TextColor bg = (letter + number) % 2 == 0 ? TextColor.ANSI.BLUE_BRIGHT
                             : TextColor.ANSI.GREEN_BRIGHT;
 
                     if (chessman != null) {
@@ -184,7 +184,6 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
             super(value + " ");
             this.setForegroundColor(fg);
             this.setBackgroundColor(bg);
-            this.addStyle(SGR.BOLD);
         }
 
     }

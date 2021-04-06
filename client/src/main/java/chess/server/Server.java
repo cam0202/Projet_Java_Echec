@@ -32,6 +32,7 @@ public class Server {
     private String name;
     private String description;
 
+    private String forcedUsername;
     private String username;
 
     public Server() {
@@ -41,6 +42,8 @@ public class Server {
 
         this.name = null;
         this.description = null;
+
+        this.forcedUsername = null;
     }
 
     public boolean isConnected() {
@@ -54,6 +57,14 @@ public class Server {
 
         assert (this.listenerTCP != null);
         this.listenerTCP.setCallback(callback);
+    }
+
+    public void setForcedUsername(final String username) {
+        this.forcedUsername = username;
+    }
+
+    public String getForcedUsername() {
+        return this.forcedUsername;
     }
 
     public String getName() {
@@ -124,7 +135,7 @@ public class Server {
         }
 
         Socket socketTCP = new Socket(address, port);
-        String username = "User-" + socketTCP.getLocalPort();
+        String username = this.forcedUsername != null ? this.forcedUsername : "User-" + socketTCP.getLocalPort();
 
         Message request = new Message(Message.Type.CONNECT);
         try {

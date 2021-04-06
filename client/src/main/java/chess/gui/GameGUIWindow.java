@@ -22,10 +22,10 @@ public class GameGUIWindow extends BasicWindow {
             true, 
             TextColor.ANSI.WHITE,
             TextColor.ANSI.BLACK, 
-            TextColor.ANSI.RED, 
-            TextColor.ANSI.GREEN, 
-            TextColor.ANSI.BLUE, 
-            TextColor.ANSI.YELLOW, 
+            TextColor.ANSI.BLACK, 
+            TextColor.ANSI.WHITE, 
+            TextColor.ANSI.BLUE,
+            TextColor.ANSI.WHITE, 
             TextColor.ANSI.MAGENTA
         ));
     }
