@@ -157,10 +157,10 @@ public class Board {
             this.locationFigth[1] = move.getStart();
 
             this.value = this.possiblePoint();
-            if (!chessman.getName().equals(inTheWay.getName())) {
-                return " Go to fight. " + this.possibleAttack(chessman) + " have " + chessman.getLive()
-                        + "HP and can attack with " + this.possibleAttack(chessman) + this.possibleAttack(inTheWay)
-                        + " have " + inTheWay.getLive() + "HP and can attack with " + this.possibleAttack(inTheWay);
+            if(!chessman.getName().equals(inTheWay.getName())) {
+            	return " Go to fight. ! \n" +
+                		this.possibleAttack(chessman) + " have "+ chessman.getLive() + "HP and can attack with " + this.possibleAttack(chessman) + "\n"+
+                		this.possibleAttack(inTheWay) + " have "+ inTheWay.getLive() + "HP and can attack with " + this.possibleAttack(inTheWay);
 
             } else {
                 return " Go to fight. " + this.possibleAttack(chessman) + " have " + chessman.getLive()
@@ -215,15 +215,15 @@ public class Board {
 
         attack.setValue(c);
         c.setLive(attack.getValue());
-
-        result = whoIsNextAttack.getName() + " have an impact to " + attack.getValue() + ". ("
-                + this.c1attack.getPlayer().getName() + " : " + this.c1attack.getLive() + " and "
-                + this.c2attack.getPlayer().getName() + " : " + this.c2attack.getLive();
-
-        if (c.getLive() <= 0) {
-            this.whoIsNextAttack = null;
-
-            // vide les case
+        
+        result = whoIsNextAttack.getName() + " have an impact to "+ attack.getValue() + ".\n"
+    	+ "("+this.c1attack.getPlayer().getName() + " : " + this.c1attack.getLive()
+    	+ " and " + this.c2attack.getPlayer().getName() + " : " + this.c2attack.getLive() +")";
+        
+        if(c.getLive() <= 0) {
+        	this.whoIsNextAttack = null;
+        	
+        	// vide les case
             this.board[this.locationFigth[0].getRow()][this.locationFigth[0].getCol()].clear();
             this.board[this.locationFigth[1].getRow()][this.locationFigth[1].getCol()].clear();
 
@@ -273,7 +273,7 @@ public class Board {
      */
     public String possibleAttack(Chessman c) {
         return c.getName() + "can attack with " + c.getAttacks()[0].getName() + ", " + c.getAttacks()[1].getName()
-                + ", " + c.getAttacks()[2].getName() + ".";
+                + ", " + c.getAttacks()[2].getName();
     }
 
     /**
