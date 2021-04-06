@@ -53,9 +53,13 @@ public class BoardTest {
 		Move m3 = new Move('c','6','d','4');
 		Move m4 = new Move('a','2','a','3');
 		
-		assertTrue(this.board.play(this.player2,m1, null).contains("moved"));
+		
 		assertTrue(this.board.play(this.player1,m2, null).contains("moved"));
+		assertTrue(this.board.play(this.player2,m1, null).contains("moved"));
+		assertTrue(this.board.play(this.player1,m4, null).contains("moved"));
 		assertTrue(this.board.play(this.player2,m3, null).contains("fight"));
+		
+		/*
 		boolean t = true;
 		while(t) {
 			if(this.board.getC1attack().getLive() > 0 && this.board.getC2attack().getLive() > 0 ) {
@@ -74,7 +78,7 @@ public class BoardTest {
 			assertEquals(this.board.getBoard()[3][3].getChessman(), this.board.getC2attack());
 		}
 		
-		
+		*/
 		
 	}
 }
