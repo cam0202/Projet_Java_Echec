@@ -217,8 +217,8 @@ public class Board {
         c.setLive(attack.getValue());
         
         result = whoIsNextAttack.getName() + " have an impact to "+ attack.getValue() + ".\n"
-    	+ ". ("+this.c1attack.getPlayer().getName() + " : " + this.c1attack.getLive()
-    	+ " and " + this.c2attack.getPlayer().getName() + " : " + this.c2attack.getLive();
+    	+ "("+this.c1attack.getPlayer().getName() + " : " + this.c1attack.getLive()
+    	+ " and " + this.c2attack.getPlayer().getName() + " : " + this.c2attack.getLive() +")";
         
         if(c.getLive() <= 0) {
         	this.whoIsNextAttack = null;
@@ -277,7 +277,7 @@ public class Board {
      */
     public String possibleAttack(Chessman c) {
         return c.getName() + "can attack with " + c.getAttacks()[0].getName() + ", " + c.getAttacks()[1].getName()
-                + ", " + c.getAttacks()[2].getName() + ".";
+                + ", " + c.getAttacks()[2].getName();
     }
 
     /**
