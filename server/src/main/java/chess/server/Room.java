@@ -1,5 +1,7 @@
 package chess.server;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
@@ -16,6 +18,8 @@ public class Room {
     private final Player black;
 
     private final Board board;
+
+    private final int number;
 
     public Room(final Player white, final Player black) {
         this(white, black, null);
@@ -37,6 +41,8 @@ public class Room {
         if (boardSerialized != null) {
             this.board.deserialize(boardSerialized);
         }
+
+        this.number = new Random().nextInt(8999) + 1000;
     }
 
     public Player getPlayerWhite() {
@@ -67,7 +73,7 @@ public class Room {
 
     public JSONObject getState() {
         JSONObject root = new JSONObject();
-        root.put("number", 9999); // TODO
+        root.put("number", this.number);
         root.put("board", this.board.serialize());
         return root;
     }

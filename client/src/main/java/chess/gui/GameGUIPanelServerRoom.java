@@ -92,6 +92,7 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
             String whiteUsername = root.getString("white");
             String blackUsername = root.getString("black");
             String whoIsNextUsername = root.getString("whoIsNext");
+            String whoIsNextAttackUsername = root.optString("whoIsNextAttack");
 
             String ourUsername = this.getGame().getServer().getUsername();
 
@@ -103,8 +104,14 @@ public class GameGUIPanelServerRoom extends GameGUIPanel {
 
             this.pRoomInfo.addComponent(
                     new Label(String.format("You are %s", ourColor.equals(TextColor.ANSI.WHITE) ? "white" : "black")));
-            this.pRoomInfo.addComponent(new Label(
-                    String.format("It's %s", whoIsNextUsername.equals(ourUsername) ? "your turn" : "not your turn")));
+
+            if (whoIsNextAttackUsername.isEmpty()) {
+                this.pRoomInfo.addComponent(new Label(String.format("It's %s",
+                        whoIsNextUsername.equals(ourUsername) ? "your turn" : "not your turn")));
+            } else {
+                this.pRoomInfo.addComponent(new Label(String.format("It's %s",
+                        whoIsNextAttackUsername.equals(ourUsername) ? "your turn" : "not your turn")));
+            }
 
             // Update whole board
             this.pBoard.removeAllComponents();

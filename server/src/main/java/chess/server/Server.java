@@ -31,7 +31,7 @@ public class Server {
         this.uuid = UUID.randomUUID();
     }
 
-    public void addPlayer(final UUID uuid, final Player player) {
+    public synchronized void addPlayer(final UUID uuid, final Player player) {
         if (uuid == null) {
             throw new IllegalArgumentException("uuid cannot be null");
         }
@@ -49,7 +49,7 @@ public class Server {
         LOGGER.debug("User " + player.getName() + " joined the server");
     }
 
-    public void removePlayer(final UUID uuid) {
+    public synchronized void removePlayer(final UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("uuid cannot be null");
         }
@@ -64,7 +64,7 @@ public class Server {
         this.players.remove(uuid);
     }
 
-    public void addRoom(final Room room) {
+    public synchronized void addRoom(final Room room) {
         if (room == null) {
             throw new IllegalArgumentException("room is null");
         }
@@ -73,7 +73,7 @@ public class Server {
         this.playersToRooms.put(room.getPlayerBlack().getUUID(), room);
     }
 
-    public void removeRoom(final Room room) {
+    public synchronized void removeRoom(final Room room) {
         if (room == null) {
             throw new IllegalArgumentException("room is null");
         }
