@@ -40,6 +40,9 @@ public class Attack {
      */
     public void setValue(Chessman c) {
         this.value = (c.getLive()/2) + (int)(Math.random() * (c.getLive() - (c.getLive()/2)));
+        if(c.getLive() == 1) {
+        	this.value = 1;
+        }
     }
 
 }
