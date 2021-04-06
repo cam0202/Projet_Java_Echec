@@ -56,8 +56,8 @@ public class Board {
         // init tableau de score
         this.score = new int[2];
 
-        // init joueur suivant dep
-        this.whoIsNext = black;
+        // variable qui sert à savoir quel joueur doit jouer
+        this.whoIsNext = this.white;
 
         // init attaque
         this.whoIsNextAttack = null;
