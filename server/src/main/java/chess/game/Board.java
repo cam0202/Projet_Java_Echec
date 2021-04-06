@@ -158,8 +158,8 @@ public class Board {
 
             this.value = this.possiblePoint();
             if(!chessman.getName().equals(inTheWay.getName())) {
-            	return " Go to fight. " +
-                		this.possibleAttack(chessman) + " have "+ chessman.getLive() + "HP and can attack with " + this.possibleAttack(chessman) +
+            	return " Go to fight. ! \n" +
+                		this.possibleAttack(chessman) + " have "+ chessman.getLive() + "HP and can attack with " + this.possibleAttack(chessman) + "\n"+
                 		this.possibleAttack(inTheWay) + " have "+ inTheWay.getLive() + "HP and can attack with " + this.possibleAttack(inTheWay);
 
             } else {
@@ -216,7 +216,7 @@ public class Board {
         attack.setValue(c);
         c.setLive(attack.getValue());
         
-        result = whoIsNextAttack.getName() + " have an impact to "+ attack.getValue() 
+        result = whoIsNextAttack.getName() + " have an impact to "+ attack.getValue() + ".\n"
     	+ ". ("+this.c1attack.getPlayer().getName() + " : " + this.c1attack.getLive()
     	+ " and " + this.c2attack.getPlayer().getName() + " : " + this.c2attack.getLive();
         
@@ -376,7 +376,7 @@ public class Board {
         root.put("white", this.white.getName());
         root.put("black", this.black.getName());
         root.put("whoIsNext", this.whoIsNext.getName());
-        if(this.whoIsNext == null) {
+        if(this.whoIsNextAttack == null) {
         	root.put("whoIsNextAttack", (JSONObject)null);
         }else {
         	root.put("whoIsNextAttack", this.whoIsNextAttack.getPlayer().getName());
