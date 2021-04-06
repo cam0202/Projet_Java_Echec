@@ -376,6 +376,11 @@ public class Board {
         root.put("white", this.white.getName());
         root.put("black", this.black.getName());
         root.put("whoIsNext", this.whoIsNext.getName());
+        if(this.whoIsNext == null) {
+        	root.put("whoIsNextAttack", (JSONObject)null);
+        }else {
+        	root.put("whoIsNextAttack", this.whoIsNextAttack.getPlayer().getName());
+        }
         root.put("score", this.score);
 
         // board
